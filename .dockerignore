@@ -1,0 +1,37 @@
+# Dockerコンテキストから除外するファイル
+
+# Git
+.git
+.gitignore
+
+# Dockerファイル
+.dockerignore
+docker-compose*.yml
+Dockerfile*
+
+# Node.js
+node_modules
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Next.js
+.next
+out
+
+# デプロイ環境情報
+.vercel
+
+# 環境変数
+.env*
+!.env.example
+
+# エディタ設定
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS関連
+.DS_Store
+Thumbs.db
