@@ -87,6 +87,10 @@ graph_e_rc2/
 │   │   ├── games/          # ゲーム機能
 │   ├── components/         # 共通コンポーネント
 │   │   ├── auth/           # 認証関連のコンポーネント
+│   │   │   ├── AuthProvider.tsx  # 認証状態管理
+│   │   │   ├── LoginForm.tsx     # ログインフォーム
+│   │   │   ├── SignupForm.tsx    # サインアップフォーム
+│   │   │   ├── ProtectedRoute.tsx # 認証保護ルート
 │   │   ├── Header.tsx      # ヘッダーコンポーネント
 │   └── lib/                # ユーティリティと共通ロジック
 │       ├── supabase.ts     # Supabase設定
@@ -104,6 +108,29 @@ graph_e_rc2/
 1. Docker Composeでngrokサービスも起動されます
 2. ngrok管理パネル（http://localhost:4040）で発行されたURLを確認
 3. 発行されたURLを使用して外部からアプリケーションにアクセス可能
+
+## デプロイ注意事項
+
+### Cloudflare Pagesへのデプロイ
+
+Cloudflare Pagesにデプロイする際の注意点：
+
+1. **クライアントコンポーネントの制約**
+   - `useSearchParams`や`usePathname`などのクライアントサイドフックを使用する場合は、必ず`Suspense`でラップする必要があります
+   - これらのフックは別のクライアントコンポーネントに分離し、親コンポーネントから`Suspense`でラップすることを推奨します
+
+2. **環境変数の設定**
+   - Cloudflare Pagesの環境変数設定でSupabaseの認証情報を設定する必要があります
+   - 本番環境用のAPIキーとURLを使用してください（開発環境のものとは分けることを推奨）
+
+3. **ビルド設定**
+   - ビルドコマンド: `npm run build`
+   - ビルド出力ディレクトリ: `.next`
+   - Node.jsバージョン: `18.x`または最新の安定版
+
+4. **デプロイ時の確認事項**
+   - デプロイ前にローカルで`npm run build`を実行してビルドエラーがないか確認
+   - 特に認証関連のリダイレクトURLが本番環境のURLになっているか確認
 
 ---
 
@@ -196,6 +223,10 @@ graph_e_rc2/
 │   │   ├── games/          # Games functionality
 │   ├── components/         # Common components
 │   │   ├── auth/           # Authentication-related components
+│   │   │   ├── AuthProvider.tsx  # Authentication state management
+│   │   │   ├── LoginForm.tsx     # Login form
+│   │   │   ├── SignupForm.tsx    # Signup form
+│   │   │   ├── ProtectedRoute.tsx # Protected route
 │   │   ├── Header.tsx      # Header component
 │   └── lib/                # Utilities and common logic
 │       ├── supabase.ts     # Supabase configuration
@@ -213,3 +244,26 @@ When you need to temporarily expose your development application externally:
 1. The ngrok service is started with Docker Compose
 2. Check the issued URL on the ngrok admin panel (http://localhost:4040)
 3. Use the issued URL to access your application from external sources
+
+## Deployment Notes
+
+### Deploying to Cloudflare Pages
+
+Important notes for deploying to Cloudflare Pages:
+
+1. **Client Component Constraints**
+   - Hooks like `useSearchParams` and `usePathname` must be wrapped in a `Suspense` boundary
+   - It's recommended to separate these hooks into separate client components and wrap them with `Suspense` from the parent component
+
+2. **Environment Variables**
+   - Set Supabase authentication information in Cloudflare Pages environment variables
+   - Use production API keys and URLs (recommended to keep them separate from development ones)
+
+3. **Build Settings**
+   - Build command: `npm run build`
+   - Build output directory: `.next`
+   - Node.js version: `18.x` or the latest stable version
+
+4. **Pre-deployment Checklist**
+   - Run `npm run build` locally to check for build errors before deploying
+   - Verify that authentication redirect URLs are set to production URLs
