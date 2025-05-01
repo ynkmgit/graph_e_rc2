@@ -15,6 +15,7 @@
 - **開発環境**: Docker
 - **デプロイ環境**: Cloudflare Pages
 - **認証**: Supabase Auth
+- **ローカル公開**: ngrok（ローカル開発環境の外部公開）
 
 ## 開発環境のセットアップ
 
@@ -23,6 +24,7 @@
 - Docker と Docker Compose がインストールされていること
 - Git がインストールされていること
 - Supabaseアカウントを作成していること
+- ngrokアカウント（無料または有料プラン）
 
 ### セットアップ手順
 
@@ -45,7 +47,8 @@
 
 4. アプリケーションにアクセスする
    ```
-   http://localhost:3000
+   http://localhost:3000  # ローカルアクセス
+   http://localhost:4040  # ngrok管理パネル（外部公開URL確認用）
    ```
 
 ## 主な機能
@@ -66,10 +69,19 @@ graph_e_rc2/
 │   ├── components/         # 共通コンポーネント
 │   └── lib/                # ユーティリティと共通ロジック
 ├── public/                 # 静的ファイル
+├── config/                 # 設定ファイル
 ├── docker-compose.yml      # Docker Compose設定
 ├── Dockerfile              # Dockerビルド設定
 └── .env.example            # 環境変数サンプル
 ```
+
+## ngrokを使った外部公開
+
+開発中のアプリケーションを一時的に外部公開する必要がある場合、ngrokを使用します。
+
+1. Docker Composeでngrokサービスも起動されます
+2. ngrok管理パネル（http://localhost:4040）で発行されたURLを確認
+3. 発行されたURLを使用して外部からアプリケーションにアクセス可能
 
 ---
 
@@ -90,6 +102,7 @@ This project is a real-time interactive platform built using Next.js, Supabase, 
 - **Development Environment**: Docker
 - **Deployment Environment**: Cloudflare Pages
 - **Authentication**: Supabase Auth
+- **Local Tunneling**: ngrok (exposing local development environment)
 
 ## Development Environment Setup
 
@@ -98,6 +111,7 @@ This project is a real-time interactive platform built using Next.js, Supabase, 
 - Docker and Docker Compose installed
 - Git installed
 - Supabase account created
+- ngrok account (free or paid plan)
 
 ### Setup Steps
 
@@ -120,7 +134,8 @@ This project is a real-time interactive platform built using Next.js, Supabase, 
 
 4. Access the application
    ```
-   http://localhost:3000
+   http://localhost:3000  # Local access
+   http://localhost:4040  # ngrok admin panel (for checking public URL)
    ```
 
 ## Main Features
@@ -141,7 +156,16 @@ graph_e_rc2/
 │   ├── components/         # Common components
 │   └── lib/                # Utilities and common logic
 ├── public/                 # Static files
+├── config/                 # Configuration files
 ├── docker-compose.yml      # Docker Compose configuration
 ├── Dockerfile              # Docker build configuration
 └── .env.example            # Sample environment variables
 ```
+
+## External Access with ngrok
+
+When you need to temporarily expose your development application externally:
+
+1. The ngrok service is started with Docker Compose
+2. Check the issued URL on the ngrok admin panel (http://localhost:4040)
+3. Use the issued URL to access your application from external sources

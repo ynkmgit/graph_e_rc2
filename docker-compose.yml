@@ -19,6 +19,19 @@ services:
     tty: true
     # 依存関係が変わった場合に自動的に再起動する
     restart: unless-stopped
+    # コンテナ名を明示的に設定
+    container_name: graph_e_rc2_app
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    # 環境変数を直接コマンドで指定
+    command: http --authtoken=${NGROK_AUTHTOKEN} app:3000
+    ports:
+      - "4040:4040"
+    depends_on:
+      - app
+    # コンテナ名を明示的に設定
+    container_name: graph_e_rc2_ngrok
 
 volumes:
   node_modules:
