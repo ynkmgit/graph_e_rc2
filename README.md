@@ -1,10 +1,32 @@
 # リアルタイムインタラクティブプラットフォーム
 
-リアルタイムチャットとボードゲームを統合したソーシャルプラットフォームです。
+リアルタイムチャット、ボードゲーム、インタラクティブビジュアライゼーションとユーティリティツールを統合したフリーミアム型ソーシャルプラットフォームです。既存の「ぐらふい」プロジェクトの機能を継承し、さらに拡張していきます。
 
 ## プロジェクト概要
 
-このプロジェクトは、Next.js、Supabase、Docker、Cloudflare Pagesを使用して構築されたリアルタイムインタラクティブプラットフォームです。ユーザーはリアルタイムチャットでコミュニケーションを取りながら、様々なボードゲームを楽しむことができます。
+このプロジェクトは、Next.js、Supabase、Docker、Cloudflare Pagesを使用して構築されたリアルタイムインタラクティブプラットフォームです。ユーザーはリアルタイムチャットでコミュニケーションを取りながら、視覚的シミュレーション、ボードゲーム、便利なツールを利用・共有したりできます。基本機能は無料で提供し、高度な機能を有料プランとして提供するフリーミアムモデルを採用しています。
+
+## 主な機能
+
+### 継承される「ぐらふい」の機能
+- **ハーモノグラフ**: 振り子の動きが生み出す美しい幾何学模様
+- **ライフゲーム**: セルオートマトンによる生命シミュレーション
+- **惑星軌道（星たちのダンス）**: 惑星の軌道パターンの視覚化
+- **オイラーの公式 3Dグラフ**: 数学的公式の3D視覚化
+- **その他のツール**: 十字グラフ、生存戦略ゲームなど
+
+### 新たに開発する機能
+- **リアルタイムチャット**: ユーザー間でのテキストコミュニケーション
+- **ユーティリティツール**: JSON整形、QRコード生成など
+- **共有・協働機能**: ツールの共同編集とリアルタイム共有
+- **ユーザープロフィール**: カスタマイズ可能なプロフィール
+- **コンテンツギャラリー**: ユーザー作品の共有と閲覧
+
+### 無料機能と有料機能の区分
+- **無料機能**: 基本的なツール、シンプルなチャット、基本的な共有機能
+- **有料機能**: 高度なツール設定、無制限の履歴保存、チーム機能、高度な協働ツール
+
+詳細な機能マップは `docs/platform_mindmap.md` を参照してください。
 
 ## 技術スタック
 
@@ -51,14 +73,36 @@
    http://localhost:4040  # ngrok管理パネル（外部公開URL確認用）
    ```
 
-## 主な機能
+## ディレクトリ構造
 
-- ユーザー認証（サインアップ、ログイン、ログアウト）
-- リアルタイムチャット
-- オンライン状態表示
-- ボードゲームプラットフォーム
-- マルチプレイヤー対応
-- 通知システム
+```
+graph_e_rc2/
+├── docs/                   # プロジェクト設計ドキュメント
+│   ├── platform_mindmap.md # 機能マインドマップ
+│   ├── platform_concept.md # プラットフォームコンセプト詳細
+│   ├── existing_features.md # 既存「ぐらふい」機能リファレンス
+│   └── tool_implementation_guide.md # ツール実装ガイド
+├── src/                    # ソースコード
+│   ├── app/                # Next.js App Router
+│   │   ├── auth/           # 認証関連のルート
+│   │   ├── login/          # ログインページ
+│   │   ├── signup/         # サインアップページ
+│   │   ├── chat/           # チャット機能
+│   │   ├── games/          # ゲーム機能
+│   │   └── tools/          # ツール機能（既存+新規）
+│   ├── components/         # 共通コンポーネント
+│   │   ├── auth/           # 認証関連のコンポーネント
+│   │   ├── tools/          # ツール関連コンポーネント
+│   │   └── ui/             # 共通UIコンポーネント
+│   └── lib/                # ユーティリティと共通ロジック
+│       ├── supabase.ts     # Supabase設定
+│       └── tools/          # ツール関連ユーティリティ
+├── public/                 # 静的ファイル
+├── config/                 # 設定ファイル
+├── docker-compose.yml      # Docker Compose設定
+├── Dockerfile              # Dockerビルド設定
+└── .env.example            # 環境変数サンプル
+```
 
 ## 実装状況
 
@@ -70,38 +114,35 @@
 
 ### 進行中
 - リアルタイムチャット機能
-- ボードゲームプラットフォーム
+- 既存「ぐらふい」ツールの移植
+- 基本的な共有機能
 - オンライン状態表示
 - 通知システム
 
-## ディレクトリ構造
+### 今後の予定
+- ハーモノグラフツールの移植
+- ライフゲームの移植
+- 惑星軌道ツールの移植
+- 新規ユーティリティツールの実装
+- 有料機能の設計と実装
 
-```
-graph_e_rc2/
-├── src/                    # ソースコード
-│   ├── app/                # Next.js App Router
-│   │   ├── auth/           # 認証関連のルート
-│   │   │   ├── callback/   # 認証コールバック処理
-│   │   │   │   └── route.ts # エッジランタイム対応API Route
-│   │   ├── login/          # ログインページ
-│   │   ├── signup/         # サインアップページ
-│   │   ├── chat/           # チャット機能
-│   │   ├── games/          # ゲーム機能
-│   ├── components/         # 共通コンポーネント
-│   │   ├── auth/           # 認証関連のコンポーネント
-│   │   │   ├── AuthProvider.tsx  # 認証状態管理
-│   │   │   ├── LoginForm.tsx     # ログインフォーム
-│   │   │   ├── SignupForm.tsx    # サインアップフォーム
-│   │   │   ├── ProtectedRoute.tsx # 認証保護ルート
-│   │   ├── Header.tsx      # ヘッダーコンポーネント
-│   └── lib/                # ユーティリティと共通ロジック
-│       ├── supabase.ts     # Supabase設定
-├── public/                 # 静的ファイル
-├── config/                 # 設定ファイル
-├── docker-compose.yml      # Docker Compose設定
-├── Dockerfile              # Dockerビルド設定
-└── .env.example            # 環境変数サンプル
-```
+## ロードマップ
+
+### 第1フェーズ（基盤構築）
+- 基本認証システムの完成
+- シンプルなチャット機能
+- 既存「ぐらふい」ツールの移植（ハーモノグラフ、ライフゲーム）
+- 基本的なツール（JSON整形、QRコード生成など）
+
+### 第2フェーズ（機能拡充）
+- 追加ツールの移植と実装
+- 基本的な共有機能
+- 初期の有料機能（高度なチャット機能、プレミアムツール）
+
+### 第3フェーズ（収益化強化）
+- チーム機能（プライベートルーム、高度な権限管理）
+- 高度な協働ツール（プロジェクト管理機能など）
+- プレミアムツール拡張（AI支援機能、高度なデータ分析）
 
 ## ngrokを使った外部公開
 
@@ -146,11 +187,33 @@ Cloudflare Pagesにデプロイする際の注意点：
 
 # Real-time Interactive Platform
 
-A social platform that integrates real-time chat and board games.
+A freemium social platform that integrates real-time chat, board games, interactive visualizations and utility tools. This project inherits features from the existing "ぐらふい" (Graph-e) project and extends them further.
 
 ## Project Overview
 
-This project is a real-time interactive platform built using Next.js, Supabase, Docker, and Cloudflare Pages. Users can communicate through real-time chat while enjoying various board games.
+This project is a real-time interactive platform built using Next.js, Supabase, Docker, and Cloudflare Pages. Users can communicate through real-time chat while enjoying visual simulations, board games, and using/sharing useful tools. It adopts a freemium model, offering basic features for free and advanced features as paid plans.
+
+## Main Features
+
+### Inherited "ぐらふい" Features
+- **Harmonograph**: Beautiful geometric patterns created by pendulum movements
+- **Game of Life**: Life simulation through cellular automaton
+- **Planetary Orbit (Dance of Stars)**: Visualization of planetary orbit patterns
+- **Euler's Formula 3D Graph**: 3D visualization of mathematical formula
+- **Other Tools**: Cross Graph, Survival Strategy Game, and more
+
+### Newly Developed Features
+- **Real-time Chat**: Text communication between users
+- **Utility Tools**: JSON formatter, QR code generator, etc.
+- **Sharing & Collaboration**: Co-editing and real-time sharing of tools
+- **User Profiles**: Customizable profiles
+- **Content Gallery**: Sharing and browsing user creations
+
+### Free and Paid Features
+- **Free Features**: Basic tools, simple chat, basic sharing functionality
+- **Paid Features**: Advanced tool settings, unlimited history storage, team features, advanced collaboration tools
+
+For a detailed feature map, please refer to `docs/platform_mindmap.md`.
 
 ## Tech Stack
 
@@ -197,14 +260,36 @@ This project is a real-time interactive platform built using Next.js, Supabase, 
    http://localhost:4040  # ngrok admin panel (for checking public URL)
    ```
 
-## Main Features
+## Directory Structure
 
-- User authentication (signup, login, logout)
-- Real-time chat
-- Online status display
-- Board game platform
-- Multiplayer support
-- Notification system
+```
+graph_e_rc2/
+├── docs/                   # Project design documents
+│   ├── platform_mindmap.md # Feature mind map
+│   ├── platform_concept.md # Platform concept details
+│   ├── existing_features.md # Existing "ぐらふい" features reference
+│   └── tool_implementation_guide.md # Tool implementation guide
+├── src/                    # Source code
+│   ├── app/                # Next.js App Router
+│   │   ├── auth/           # Authentication-related routes
+│   │   ├── login/          # Login page
+│   │   ├── signup/         # Signup page
+│   │   ├── chat/           # Chat functionality
+│   │   ├── games/          # Games functionality
+│   │   └── tools/          # Tool functionality (existing + new)
+│   ├── components/         # Common components
+│   │   ├── auth/           # Authentication-related components
+│   │   ├── tools/          # Tool-related components
+│   │   └── ui/             # Common UI components
+│   └── lib/                # Utilities and common logic
+│       ├── supabase.ts     # Supabase configuration
+│       └── tools/          # Tool-related utilities
+├── public/                 # Static files
+├── config/                 # Configuration files
+├── docker-compose.yml      # Docker Compose configuration
+├── Dockerfile              # Docker build configuration
+└── .env.example            # Sample environment variables
+```
 
 ## Implementation Status
 
@@ -216,38 +301,35 @@ This project is a real-time interactive platform built using Next.js, Supabase, 
 
 ### In Progress
 - Real-time chat functionality
-- Board game platform
+- Migration of existing "ぐらふい" tools
+- Basic sharing functionality
 - Online status display
 - Notification system
 
-## Directory Structure
+### Planned
+- Integration of Harmonograph tool
+- Integration of Game of Life
+- Integration of Planetary Orbit tool
+- Implementation of new utility tools
+- Design and implementation of paid features
 
-```
-graph_e_rc2/
-├── src/                    # Source code
-│   ├── app/                # Next.js App Router
-│   │   ├── auth/           # Authentication-related routes
-│   │   │   ├── callback/   # Auth callback handling
-│   │   │   │   └── route.ts # Edge runtime API Route
-│   │   ├── login/          # Login page
-│   │   ├── signup/         # Signup page
-│   │   ├── chat/           # Chat functionality
-│   │   ├── games/          # Games functionality
-│   ├── components/         # Common components
-│   │   ├── auth/           # Authentication-related components
-│   │   │   ├── AuthProvider.tsx  # Authentication state management
-│   │   │   ├── LoginForm.tsx     # Login form
-│   │   │   ├── SignupForm.tsx    # Signup form
-│   │   │   ├── ProtectedRoute.tsx # Protected route
-│   │   ├── Header.tsx      # Header component
-│   └── lib/                # Utilities and common logic
-│       ├── supabase.ts     # Supabase configuration
-├── public/                 # Static files
-├── config/                 # Configuration files
-├── docker-compose.yml      # Docker Compose configuration
-├── Dockerfile              # Docker build configuration
-└── .env.example            # Sample environment variables
-```
+## Roadmap
+
+### Phase 1 (Foundation)
+- Complete basic authentication system
+- Simple chat functionality
+- Migration of existing "ぐらふい" tools (Harmonograph, Game of Life)
+- Basic tools (JSON formatter, QR code generator, etc.)
+
+### Phase 2 (Feature Expansion)
+- Additional tools migration and implementation
+- Basic sharing functionality
+- Initial paid features (advanced chat features, premium tools)
+
+### Phase 3 (Monetization Enhancement)
+- Team features (private rooms, advanced permission management)
+- Advanced collaboration tools (project management features, etc.)
+- Premium tool expansion (AI assistance features, advanced data analysis)
 
 ## External Access with ngrok
 
