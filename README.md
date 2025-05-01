@@ -81,6 +81,8 @@ graph_e_rc2/
 ├── src/                    # ソースコード
 │   ├── app/                # Next.js App Router
 │   │   ├── auth/           # 認証関連のルート
+│   │   │   ├── callback/   # 認証コールバック処理
+│   │   │   │   └── route.ts # エッジランタイム対応API Route
 │   │   ├── login/          # ログインページ
 │   │   ├── signup/         # サインアップページ
 │   │   ├── chat/           # チャット機能
@@ -119,16 +121,24 @@ Cloudflare Pagesにデプロイする際の注意点：
    - `useSearchParams`や`usePathname`などのクライアントサイドフックを使用する場合は、必ず`Suspense`でラップする必要があります
    - これらのフックは別のクライアントコンポーネントに分離し、親コンポーネントから`Suspense`でラップすることを推奨します
 
-2. **環境変数の設定**
+2. **Edge Runtime対応**
+   - 動的なAPI routes（route handlers）は、Edge Runtimeとして設定する必要があります
+   - 各route.tsファイルに以下の行を追加してください:
+     ```typescript
+     export const runtime = 'edge';
+     ```
+   - これはCloudflare Workersの環境で実行するために必要な設定です
+
+3. **環境変数の設定**
    - Cloudflare Pagesの環境変数設定でSupabaseの認証情報を設定する必要があります
    - 本番環境用のAPIキーとURLを使用してください（開発環境のものとは分けることを推奨）
 
-3. **ビルド設定**
+4. **ビルド設定**
    - ビルドコマンド: `npm run build`
    - ビルド出力ディレクトリ: `.next`
    - Node.jsバージョン: `18.x`または最新の安定版
 
-4. **デプロイ時の確認事項**
+5. **デプロイ時の確認事項**
    - デプロイ前にローカルで`npm run build`を実行してビルドエラーがないか確認
    - 特に認証関連のリダイレクトURLが本番環境のURLになっているか確認
 
@@ -217,6 +227,8 @@ graph_e_rc2/
 ├── src/                    # Source code
 │   ├── app/                # Next.js App Router
 │   │   ├── auth/           # Authentication-related routes
+│   │   │   ├── callback/   # Auth callback handling
+│   │   │   │   └── route.ts # Edge runtime API Route
 │   │   ├── login/          # Login page
 │   │   ├── signup/         # Signup page
 │   │   ├── chat/           # Chat functionality
@@ -255,15 +267,23 @@ Important notes for deploying to Cloudflare Pages:
    - Hooks like `useSearchParams` and `usePathname` must be wrapped in a `Suspense` boundary
    - It's recommended to separate these hooks into separate client components and wrap them with `Suspense` from the parent component
 
-2. **Environment Variables**
+2. **Edge Runtime Configuration**
+   - Dynamic API routes (route handlers) must be configured to run with the Edge Runtime
+   - Add the following line to each route.ts file:
+     ```typescript
+     export const runtime = 'edge';
+     ```
+   - This configuration is required for execution in the Cloudflare Workers environment
+
+3. **Environment Variables**
    - Set Supabase authentication information in Cloudflare Pages environment variables
    - Use production API keys and URLs (recommended to keep them separate from development ones)
 
-3. **Build Settings**
+4. **Build Settings**
    - Build command: `npm run build`
    - Build output directory: `.next`
    - Node.js version: `18.x` or the latest stable version
 
-4. **Pre-deployment Checklist**
+5. **Pre-deployment Checklist**
    - Run `npm run build` locally to check for build errors before deploying
    - Verify that authentication redirect URLs are set to production URLs

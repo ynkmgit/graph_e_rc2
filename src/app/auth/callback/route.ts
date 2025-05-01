@@ -1,6 +1,9 @@
 import { createServerSupabaseClient } from '@/lib/supabase';
 import { NextResponse } from 'next/server';
 
+// Cloudflare Pagesにデプロイするために必要なEdge Runtime設定
+export const runtime = 'edge';
+
 // この関数はSuperbaseの認証リダイレクトをハンドリングします
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
