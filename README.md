@@ -60,14 +60,36 @@
 - マルチプレイヤー対応
 - 通知システム
 
+## 実装状況
+
+### 完了済み
+- 基本プロジェクト構造の設定
+- Docker開発環境の構築
+- ユーザー認証機能（サインアップ、ログイン、ログアウト）
+- 認証保護されたルート
+
+### 進行中
+- リアルタイムチャット機能
+- ボードゲームプラットフォーム
+- オンライン状態表示
+- 通知システム
+
 ## ディレクトリ構造
 
 ```
 graph_e_rc2/
 ├── src/                    # ソースコード
 │   ├── app/                # Next.js App Router
+│   │   ├── auth/           # 認証関連のルート
+│   │   ├── login/          # ログインページ
+│   │   ├── signup/         # サインアップページ
+│   │   ├── chat/           # チャット機能
+│   │   ├── games/          # ゲーム機能
 │   ├── components/         # 共通コンポーネント
+│   │   ├── auth/           # 認証関連のコンポーネント
+│   │   ├── Header.tsx      # ヘッダーコンポーネント
 │   └── lib/                # ユーティリティと共通ロジック
+│       ├── supabase.ts     # Supabase設定
 ├── public/                 # 静的ファイル
 ├── config/                 # 設定ファイル
 ├── docker-compose.yml      # Docker Compose設定
@@ -147,14 +169,36 @@ This project is a real-time interactive platform built using Next.js, Supabase, 
 - Multiplayer support
 - Notification system
 
+## Implementation Status
+
+### Completed
+- Basic project structure setup
+- Docker development environment
+- User authentication (signup, login, logout)
+- Protected routes
+
+### In Progress
+- Real-time chat functionality
+- Board game platform
+- Online status display
+- Notification system
+
 ## Directory Structure
 
 ```
 graph_e_rc2/
 ├── src/                    # Source code
 │   ├── app/                # Next.js App Router
+│   │   ├── auth/           # Authentication-related routes
+│   │   ├── login/          # Login page
+│   │   ├── signup/         # Signup page
+│   │   ├── chat/           # Chat functionality
+│   │   ├── games/          # Games functionality
 │   ├── components/         # Common components
+│   │   ├── auth/           # Authentication-related components
+│   │   ├── Header.tsx      # Header component
 │   └── lib/                # Utilities and common logic
+│       ├── supabase.ts     # Supabase configuration
 ├── public/                 # Static files
 ├── config/                 # Configuration files
 ├── docker-compose.yml      # Docker Compose configuration
