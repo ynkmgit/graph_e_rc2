@@ -39,6 +39,19 @@
 - **認証**: Supabase Auth
 - **ローカル公開**: ngrok（ローカル開発環境の外部公開）
 
+## データベース設計
+
+### 主要テーブル
+- **user_profiles**: ユーザー属性管理（役割とプラン情報）
+  - 役割区分: admin（管理者）、developer（開発者）、free_user（無料ユーザー）、pro_user（有料ユーザー）
+  - プラン区分: free（無料）、pro（プロ）、enterprise（法人）
+  - スクリプト: `/sql/scripts/user_profiles.sql`
+
+### データベース管理
+- SQLスクリプトは `/sql` ディレクトリで管理
+- 変更履歴は `/sql/changes.md` に記録
+- 最新のスキーマは `/sql/schema.sql` で確認可能
+
 ## 開発環境のセットアップ
 
 ### 前提条件
@@ -67,7 +80,12 @@
    docker-compose up -d
    ```
 
-4. アプリケーションにアクセスする
+4. データベースのセットアップ
+   ```
+   # Supabaseダッシュボードで /sql/scripts/user_profiles.sql を実行
+   ```
+
+5. アプリケーションにアクセスする
    ```
    http://localhost:3000  # ローカルアクセス
    http://localhost:4040  # ngrok管理パネル（外部公開URL確認用）
@@ -82,6 +100,11 @@ graph_e_rc2/
 │   ├── platform_concept.md # プラットフォームコンセプト詳細
 │   ├── existing_features.md # 既存「ぐらふい」機能リファレンス
 │   └── tool_implementation_guide.md # ツール実装ガイド
+├── sql/                    # データベース関連ファイル
+│   ├── schema.sql          # 最新のスキーマ定義
+│   ├── changes.md          # 変更の簡易記録
+│   └── scripts/            # 実行したSQLスクリプト
+│       └── user_profiles.sql # ユーザープロファイルテーブル作成
 ├── src/                    # ソースコード
 │   ├── app/                # Next.js App Router
 │   │   ├── auth/           # 認証関連のルート
@@ -111,6 +134,7 @@ graph_e_rc2/
 - Docker開発環境の構築
 - ユーザー認証機能（サインアップ、ログイン、ログアウト）
 - 認証保護されたルート
+- ユーザー属性管理データベース設計
 
 ### 進行中
 - リアルタイムチャット機能
@@ -226,6 +250,19 @@ For a detailed feature map, please refer to `docs/platform_mindmap.md`.
 - **Authentication**: Supabase Auth
 - **Local Tunneling**: ngrok (exposing local development environment)
 
+## Database Design
+
+### Main Tables
+- **user_profiles**: User attribute management (roles and plan information)
+  - Role types: admin, developer, free_user, pro_user
+  - Plan types: free, pro, enterprise
+  - Script: `/sql/scripts/user_profiles.sql`
+
+### Database Management
+- SQL scripts are managed in the `/sql` directory
+- Change history is recorded in `/sql/changes.md`
+- Latest schema can be found in `/sql/schema.sql`
+
 ## Development Environment Setup
 
 ### Prerequisites
@@ -254,7 +291,12 @@ For a detailed feature map, please refer to `docs/platform_mindmap.md`.
    docker-compose up -d
    ```
 
-4. Access the application
+4. Database Setup
+   ```
+   # Run /sql/scripts/user_profiles.sql in Supabase dashboard
+   ```
+
+5. Access the application
    ```
    http://localhost:3000  # Local access
    http://localhost:4040  # ngrok admin panel (for checking public URL)
@@ -269,6 +311,11 @@ graph_e_rc2/
 │   ├── platform_concept.md # Platform concept details
 │   ├── existing_features.md # Existing "ぐらふい" features reference
 │   └── tool_implementation_guide.md # Tool implementation guide
+├── sql/                    # Database related files
+│   ├── schema.sql          # Latest schema definition
+│   ├── changes.md          # Change history record
+│   └── scripts/            # SQL scripts executed
+│       └── user_profiles.sql # User profile table creation
 ├── src/                    # Source code
 │   ├── app/                # Next.js App Router
 │   │   ├── auth/           # Authentication-related routes
@@ -298,6 +345,7 @@ graph_e_rc2/
 - Docker development environment
 - User authentication (signup, login, logout)
 - Protected routes
+- User attribute management database design
 
 ### In Progress
 - Real-time chat functionality

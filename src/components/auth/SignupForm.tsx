@@ -41,7 +41,28 @@ export default function SignupForm() {
       if (data.user?.identities?.length === 0) {
         // すでにユーザーが存在する場合
         setError('このメールアドレスはすでに登録されています');
-      } else {
+      } else if (data.user) {
+        try {
+          // ユーザープロファイルを作成
+          const displayName = email.split('@')[0]; // メールアドレスの@前の部分をユーザー名に
+          
+          const { error: profileError } = await supabase
+            .from('user_profiles')
+            .insert({
+              id: data.user.id,
+              display_name: displayName,
+              role: 'free_user', // デフォルトは無料ユーザー
+              plan_type: 'free',  // デフォルトは無料プラン
+            });
+            
+          if (profileError) {
+            console.error('プロファイル作成エラー:', profileError);
+            // プロファイル作成エラーでもサインアップ自体は成功として扱う
+          }
+        } catch (profileError) {
+          console.error('プロファイル作成中に例外が発生:', profileError);
+        }
+        
         // 成功メッセージを表示して、ログインページにリダイレクト
         alert('登録が完了しました。メールを確認してアカウントを有効化してください。');
         router.push('/login');
