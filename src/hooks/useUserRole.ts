@@ -48,41 +48,6 @@ export const useUserRole = (): UserRoleData => {
       }
 
       try {
-        // 現在はRLSポリシーでエラーが発生するため、暫定的な対応として
-        // ここでは特定のユーザーを管理者として手動で設定します
-        // 将来的にはRLSポリシーを修正した後、正式な実装に戻す必要があります
-        if (user.email === 'hoge1@example.com') {
-          setUserData({
-            role: 'admin',
-            planType: 'free',
-            displayName: user.email?.split('@')[0] || 'User',
-            avatarUrl: null,
-            planExpiresAt: null,
-            isAdmin: true,
-            isDeveloper: true,
-            isPro: true,
-            loading: false,
-            error: null
-          });
-          return;
-        }
-
-        // 通常のユーザーはfree_userとして扱う
-        setUserData({
-          role: 'free_user',
-          planType: 'free',
-          displayName: user.email?.split('@')[0] || 'User',
-          avatarUrl: null,
-          planExpiresAt: null,
-          isAdmin: false,
-          isDeveloper: false,
-          isPro: false,
-          loading: false,
-          error: null
-        });
-
-        // 注意: 以下のコードは現在RLSポリシーの無限再帰問題で動作しません
-        /*
         // ユーザープロファイルを取得
         const { data, error } = await supabase
           .from('user_profiles')
@@ -142,7 +107,6 @@ export const useUserRole = (): UserRoleData => {
             error: null
           });
         }
-        */
       } catch (error: any) {
         console.error('ユーザーデータの取得に失敗しました:', error);
         
