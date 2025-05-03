@@ -9,7 +9,7 @@ export default function AdminDashboardPage() {
   return (
     <AdminOnly redirect={true}>
       <div className="container mx-auto p-6">
-        <h1 className="text-2xl font-bold mb-6">管理者ダッシュボード</h1>
+        <h1 className="text-2xl font-bold mb-6 dark:text-white">管理者ダッシュボード</h1>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <AdminDashboardCard
@@ -42,7 +42,7 @@ export default function AdminDashboardPage() {
         </div>
         
         <div className="mt-10">
-          <h2 className="text-xl font-semibold mb-4">最近の活動</h2>
+          <h2 className="text-xl font-semibold mb-4 dark:text-white">最近の活動</h2>
           <AdminRecentActivities />
         </div>
       </div>
@@ -64,11 +64,11 @@ function AdminDashboardCard({
   return (
     <Link 
       href={link}
-      className="bg-white rounded-lg shadow-sm p-6 border border-gray-200 hover:border-indigo-300 hover:shadow-md transition"
+      className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-600 hover:shadow-md transition"
     >
       <div className="text-3xl mb-3">{icon}</div>
-      <h3 className="text-lg font-semibold">{title}</h3>
-      <p className="text-gray-600 mt-2 text-sm">{description}</p>
+      <h3 className="text-lg font-semibold dark:text-white">{title}</h3>
+      <p className="text-gray-600 dark:text-gray-300 mt-2 text-sm">{description}</p>
     </Link>
   );
 }
@@ -102,25 +102,25 @@ function AdminRecentActivities() {
   if (loading) {
     return (
       <div className="animate-pulse space-y-4">
-        <div className="h-10 bg-gray-200 rounded"></div>
-        <div className="h-10 bg-gray-200 rounded"></div>
-        <div className="h-10 bg-gray-200 rounded"></div>
+        <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded"></div>
+        <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded"></div>
+        <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded"></div>
       </div>
     );
   }
   
   if (activities.length === 0) {
-    return <p className="text-gray-500">最近の活動はありません</p>;
+    return <p className="text-gray-500 dark:text-gray-400">最近の活動はありません</p>;
   }
   
   return (
-    <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-      <ul className="divide-y divide-gray-200">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
+      <ul className="divide-y divide-gray-200 dark:divide-gray-700">
         {activities.map(activity => (
-          <li key={activity.id} className="p-4 hover:bg-gray-50">
+          <li key={activity.id} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700">
             <div className="flex justify-between">
-              <p>{activity.message}</p>
-              <span className="text-sm text-gray-500">
+              <p className="dark:text-white">{activity.message}</p>
+              <span className="text-sm text-gray-500 dark:text-gray-400">
                 {new Date(activity.timestamp).toLocaleString()}
               </span>
             </div>

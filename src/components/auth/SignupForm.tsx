@@ -77,7 +77,7 @@ export default function SignupForm() {
   return (
     <>
       {error && (
-        <div className="bg-red-50 p-4 rounded-md text-red-600">
+        <div className="bg-red-50 dark:bg-red-900/30 p-4 rounded-md text-red-600 dark:text-red-400">
           {error}
         </div>
       )}
@@ -92,7 +92,7 @@ export default function SignupForm() {
               id="email"
               type="email"
               required
-              className="relative block w-full rounded-t-md border-0 p-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600"
+              className="relative block w-full rounded-t-md border-0 p-3 text-gray-900 dark:text-white bg-white dark:bg-gray-700 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-indigo-600 dark:focus:ring-indigo-500"
               placeholder="メールアドレス"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -106,7 +106,7 @@ export default function SignupForm() {
               id="password"
               type="password"
               required
-              className="relative block w-full border-0 p-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600"
+              className="relative block w-full border-0 p-3 text-gray-900 dark:text-white bg-white dark:bg-gray-700 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-indigo-600 dark:focus:ring-indigo-500"
               placeholder="パスワード"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -120,7 +120,7 @@ export default function SignupForm() {
               id="confirm-password"
               type="password"
               required
-              className="relative block w-full rounded-b-md border-0 p-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600"
+              className="relative block w-full rounded-b-md border-0 p-3 text-gray-900 dark:text-white bg-white dark:bg-gray-700 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-indigo-600 dark:focus:ring-indigo-500"
               placeholder="パスワード確認"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}

@@ -109,9 +109,9 @@ function UserManagementContent() {
   if (loading) {
     return (
       <div className="container mx-auto p-6">
-        <h1 className="text-2xl font-bold mb-6">ユーザー管理</h1>
+        <h1 className="text-2xl font-bold mb-6 dark:text-white">ユーザー管理</h1>
         <div className="flex justify-center my-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 dark:border-indigo-400"></div>
         </div>
       </div>
     );
@@ -120,8 +120,8 @@ function UserManagementContent() {
   if (error) {
     return (
       <div className="container mx-auto p-6">
-        <h1 className="text-2xl font-bold mb-6">ユーザー管理</h1>
-        <div className="bg-red-50 p-4 rounded-md text-red-600">
+        <h1 className="text-2xl font-bold mb-6 dark:text-white">ユーザー管理</h1>
+        <div className="bg-red-50 dark:bg-red-900/30 p-4 rounded-md text-red-600 dark:text-red-400">
           {error}
         </div>
       </div>
@@ -131,48 +131,48 @@ function UserManagementContent() {
   return (
     <div className="container mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">ユーザー管理</h1>
+        <h1 className="text-2xl font-bold dark:text-white">ユーザー管理</h1>
         <Link 
           href="/admin" 
-          className="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-md text-sm"
+          className="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-md text-sm"
         >
           ダッシュボードに戻る
         </Link>
       </div>
       
       {users.length === 0 ? (
-        <div className="bg-white rounded-lg shadow-sm p-8 text-center">
-          <p className="text-gray-500">ユーザーが見つかりませんでした</p>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8 text-center">
+          <p className="text-gray-500 dark:text-gray-400">ユーザーが見つかりませんでした</p>
         </div>
       ) : (
-        <div className="bg-white shadow overflow-hidden rounded-lg">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+        <div className="bg-white dark:bg-gray-800 shadow overflow-hidden rounded-lg">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   ユーザー
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   ロール
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   プラン
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   登録日
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {users.map((user) => (
                 <tr key={user.id}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
+                        <div className="text-sm font-medium text-gray-900 dark:text-white">
                           {user.display_name || '(名前未設定)'}
                         </div>
-                        <div className="text-xs text-gray-500">{user.id}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">{user.id}</div>
                       </div>
                     </div>
                   </td>
@@ -180,7 +180,7 @@ function UserManagementContent() {
                     <select
                       value={user.role}
                       onChange={(e) => updateUserRole(user.id, e.target.value)}
-                      className="text-sm border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                      className="text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                     >
                       <option value="admin">管理者</option>
                       <option value="developer">開発者</option>
@@ -192,19 +192,19 @@ function UserManagementContent() {
                     <select
                       value={user.plan_type}
                       onChange={(e) => updateUserPlan(user.id, e.target.value)}
-                      className="text-sm border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                      className="text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                     >
                       <option value="free">無料プラン</option>
                       <option value="pro">Proプラン</option>
                       <option value="enterprise">法人プラン</option>
                     </select>
                     {user.plan_expires_at && (
-                      <div className="text-xs text-gray-500 mt-1">
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                         有効期限: {new Date(user.plan_expires_at).toLocaleDateString()}
                       </div>
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                     {new Date(user.created_at).toLocaleDateString()}
                   </td>
                 </tr>

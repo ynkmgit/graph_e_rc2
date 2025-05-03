@@ -11,7 +11,7 @@ export default function Home() {
       <div className="w-full max-w-5xl">
         <div className="relative flex flex-col place-items-center my-12">
           <h1 className="text-4xl font-bold text-center">リアルタイムインタラクティブプラットフォーム</h1>
-          <p className="mt-4 text-xl text-center text-gray-600">
+          <p className="mt-4 text-xl text-center text-gray-600 dark:text-gray-300">
             リアルタイムチャットとボードゲームを統合したソーシャルプラットフォーム
           </p>
         </div>
@@ -22,44 +22,44 @@ export default function Home() {
               <>
                 <Link
                   href="/chat"
-                  className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
+                  className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/30"
                 >
-                  <h2 className={`mb-3 text-2xl font-semibold`}>
+                  <h2 className="mb-3 text-2xl font-semibold">
                     チャット{" "}
                     <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
                       →
                     </span>
                   </h2>
-                  <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
+                  <p className="m-0 max-w-[30ch] text-sm text-gray-500 dark:text-gray-400">
                     リアルタイムチャット機能をお試しください。
                   </p>
                 </Link>
 
                 <Link
                   href="/games"
-                  className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
+                  className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/30"
                 >
-                  <h2 className={`mb-3 text-2xl font-semibold`}>
+                  <h2 className="mb-3 text-2xl font-semibold">
                     ボードゲーム{" "}
                     <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
                       →
                     </span>
                   </h2>
-                  <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
+                  <p className="m-0 max-w-[30ch] text-sm text-gray-500 dark:text-gray-400">
                     インタラクティブなボードゲームを体験してみましょう。
                   </p>
                 </Link>
               </>
             ) : (
-              <div className="col-span-2 flex flex-col items-center p-8 bg-white rounded-lg shadow-sm">
+              <div className="col-span-2 flex flex-col items-center p-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
                 <h2 className="text-2xl font-semibold mb-4">アカウントを作成してプラットフォームを利用する</h2>
-                <p className="text-gray-600 mb-6 text-center">
+                <p className="text-gray-600 dark:text-gray-300 mb-6 text-center">
                   リアルタイムチャットやボードゲームを楽しむには、アカウントが必要です。
                 </p>
                 <div className="flex gap-4">
                   <Link
                     href="/login"
-                    className="bg-gray-100 hover:bg-gray-200 text-gray-800 px-6 py-3 rounded-md text-sm font-medium"
+                    className="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-6 py-3 rounded-md text-sm font-medium"
                   >
                     ログイン
                   </Link>
@@ -77,7 +77,7 @@ export default function Home() {
 
         {loading && (
           <div className="flex justify-center my-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 dark:border-indigo-400"></div>
           </div>
         )}
       </div>

@@ -17,19 +17,19 @@ export default function Header() {
   }
 
   return (
-    <header className="bg-white shadow-sm">
+    <header className="bg-white dark:bg-gray-800 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <Link href="/" className="text-lg font-bold text-indigo-600">
+              <Link href="/" className="text-lg font-bold text-indigo-600 dark:text-indigo-400">
                 リアルタイムプラットフォーム
               </Link>
             </div>
             <nav className="ml-6 flex space-x-4 items-center">
               <Link
                 href="/"
-                className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium"
               >
                 ホーム
               </Link>
@@ -38,13 +38,13 @@ export default function Header() {
                 <>
                   <Link
                     href="/chat"
-                    className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                    className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium"
                   >
                     チャット
                   </Link>
                   <Link
                     href="/games"
-                    className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                    className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium"
                   >
                     ゲーム
                   </Link>
@@ -53,7 +53,7 @@ export default function Header() {
                   <AdminOnly>
                     <Link
                       href="/admin"
-                      className="text-indigo-600 hover:text-indigo-800 px-3 py-2 rounded-md text-sm font-medium"
+                      className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 px-3 py-2 rounded-md text-sm font-medium"
                     >
                       管理者
                     </Link>
@@ -63,7 +63,7 @@ export default function Header() {
                   <DeveloperOnly>
                     <Link
                       href="/dev"
-                      className="text-green-600 hover:text-green-800 px-3 py-2 rounded-md text-sm font-medium"
+                      className="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 px-3 py-2 rounded-md text-sm font-medium"
                     >
                       開発者
                     </Link>
@@ -78,11 +78,11 @@ export default function Header() {
                 {user ? (
                   <div className="flex items-center space-x-4">
                     <div className="text-right">
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-gray-600 dark:text-gray-300">
                         {user.email}
                       </div>
                       {!roleLoading && (
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
                           {role === 'admin' && '管理者'}
                           {role === 'developer' && '開発者'}
                           {role === 'pro_user' && 'Proユーザー'}
@@ -92,7 +92,7 @@ export default function Header() {
                     </div>
                     <button
                       onClick={signOut}
-                      className="bg-gray-100 hover:bg-gray-200 text-gray-800 px-3 py-2 rounded-md text-sm font-medium"
+                      className="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-3 py-2 rounded-md text-sm font-medium"
                     >
                       ログアウト
                     </button>
@@ -101,7 +101,7 @@ export default function Header() {
                   <div className="flex space-x-4">
                     <Link
                       href="/login"
-                      className="bg-gray-100 hover:bg-gray-200 text-gray-800 px-3 py-2 rounded-md text-sm font-medium"
+                      className="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-3 py-2 rounded-md text-sm font-medium"
                     >
                       ログイン
                     </Link>
