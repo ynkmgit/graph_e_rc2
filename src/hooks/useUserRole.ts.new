@@ -91,27 +91,27 @@ export const useUserRole = (): UserRoleData => {
 
         // データがある場合は状態を更新
         if (data) {
-          const role = data.role as UserRole;
-          const planType = data.plan_type as PlanType;
-          
-          // 削除済みユーザーの場合は権限を無効化
+          // 削除済みユーザーのチェックを追加
           if (data.deleted_at) {
+            // 削除済みユーザーは権限を無効化
             setUserData({
-              role,
-              planType,
+              role: data.role as UserRole,
+              planType: data.plan_type as PlanType,
               displayName: data.display_name || '',
               avatarUrl: data.avatar_url,
               planExpiresAt: data.plan_expires_at,
-              isAdmin: false, // 削除済みユーザーは管理者権限なし
-              isDeveloper: false, // 削除済みユーザーは開発者権限なし
-              isPro: false, // 削除済みユーザーはPro権限なし
+              isAdmin: false, // 削除済みの場合は管理者権限を無効化
+              isDeveloper: false, // 削除済みの場合は開発者権限を無効化
+              isPro: false, // 削除済みの場合はPro権限を無効化
               loading: false,
               error: 'このアカウントは削除されています'
             });
             return;
           }
+
+          const role = data.role as UserRole;
+          const planType = data.plan_type as PlanType;
           
-          // 通常のユーザー
           setUserData({
             role,
             planType,
