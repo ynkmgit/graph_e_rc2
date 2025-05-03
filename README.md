@@ -1,12 +1,24 @@
 # リアルタイムインタラクティブプラットフォーム
 
-リアルタイムチャット、ボードゲーム、インタラクティブビジュアライゼーションとユーティリティツールを統合したフリーミアム型ソーシャルプラットフォームです。既存の「ぐらふい」プロジェクトの機能を継承し、さらに拡張していきます。
+リアルタイムチャット、ボードゲーム、インタラクティブビジュアライゼーション、ユーティリティツールを統合したフリーミアム型ソーシャルプラットフォームです。既存の「ぐらふい」プロジェクトの機能を継承し、さらに拡張していきます。
+
+## 目次
+
+- [プロジェクト概要](#プロジェクト概要)
+- [機能一覧](#機能一覧)
+- [技術スタック](#技術スタック)
+- [開発環境のセットアップ](#開発環境のセットアップ)
+- [プロジェクト構造](#プロジェクト構造)
+- [実装状況](#実装状況)
+- [開発ロードマップ](#開発ロードマップ)
+- [開発ガイド](#開発ガイド)
+- [デプロイガイド](#デプロイガイド)
 
 ## プロジェクト概要
 
-このプロジェクトは、Next.js、Supabase、Docker、Cloudflare Pagesを使用して構築されたリアルタイムインタラクティブプラットフォームです。ユーザーはリアルタイムチャットでコミュニケーションを取りながら、視覚的シミュレーション、ボードゲーム、便利なツールを利用・共有したりできます。基本機能は無料で提供し、高度な機能を有料プランとして提供するフリーミアムモデルを採用しています。
+このプロジェクトは、Next.js、Supabase、Docker、Cloudflare Pagesを使用して構築されたリアルタイムインタラクティブプラットフォームです。ユーザーはリアルタイムチャットでコミュニケーションを取りながら、視覚的シミュレーション、ボードゲーム、便利なツールを利用・共有できます。基本機能は無料で提供し、高度な機能を有料プランとして提供するフリーミアムモデルを採用しています。
 
-## 主な機能
+## 機能一覧
 
 ### 継承される「ぐらふい」の機能
 - **ハーモノグラフ**: 振り子の動きが生み出す美しい幾何学模様
@@ -30,35 +42,23 @@
 
 ## 技術スタック
 
-- **フロントエンド**: Next.js（React）
+- **フロントエンド**: Next.js 14.1.3（React 18）、TailwindCSS
 - **バックエンド**: Next.jsの`use server`機能 + Supabase API
 - **データベース**: Supabase（PostgreSQL）
 - **リアルタイム機能**: Supabaseリアルタイムサブスクリプション
-- **開発環境**: Docker
-- **デプロイ環境**: Cloudflare Pages
 - **認証**: Supabase Auth
-- **ローカル公開**: ngrok（ローカル開発環境の外部公開）
-
-## データベース設計
-
-### 主要テーブル
-- **user_profiles**: ユーザー属性管理（役割とプラン情報）
-  - 役割区分: admin（管理者）、developer（開発者）、free_user（無料ユーザー）、pro_user（有料ユーザー）
-  - プラン区分: free（無料）、pro（プロ）、enterprise（法人）
-  - スクリプト: `/sql/scripts/user_profiles.sql`
-
-### データベース管理
-- SQLスクリプトは `/sql` ディレクトリで管理
-- 変更履歴は `/sql/changes.md` に記録
-- 最新のスキーマは `/sql/schema.sql` で確認可能
+- **開発環境**: Docker、Docker Compose
+- **デプロイ環境**: Cloudflare Pages
+- **言語**: TypeScript
+- **ローカル公開**: ngrok（開発環境の外部公開）
 
 ## 開発環境のセットアップ
 
 ### 前提条件
 
-- Docker と Docker Compose がインストールされていること
-- Git がインストールされていること
-- Supabaseアカウントを作成していること
+- Docker と Docker Compose がインストール済み
+- Git がインストール済み
+- Supabaseアカウントを作成済み
 - ngrokアカウント（無料または有料プラン）
 
 ### セットアップ手順
@@ -75,36 +75,39 @@
    # .envファイルを編集して必要な環境変数を設定する
    ```
 
+   必須の環境変数:
+   - `NEXT_PUBLIC_SUPABASE_URL`: SupabaseプロジェクトのURL
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Supabaseの匿名キー
+   - `NGROK_AUTHTOKEN`: ngrokの認証トークン（外部公開に必要）
+
 3. Dockerコンテナをビルドして起動する
    ```bash
    docker-compose up -d
    ```
 
 4. データベースのセットアップ
-   ```
-   # Supabaseダッシュボードで /sql/scripts/user_profiles.sql を実行
-   ```
+   - Supabaseダッシュボードにログイン
+   - SQLエディタを開く
+   - `/sql/scripts/user_profiles.sql` の内容を実行
 
 5. アプリケーションにアクセスする
    ```
-   http://localhost:3000  # ローカルアクセス
+   http://localhost:3000  # アプリケーション本体
    http://localhost:4040  # ngrok管理パネル（外部公開URL確認用）
    ```
 
-## ディレクトリ構造
+## プロジェクト構造
 
 ```
 graph_e_rc2/
 ├── docs/                   # プロジェクト設計ドキュメント
 │   ├── platform_mindmap.md # 機能マインドマップ
 │   ├── platform_concept.md # プラットフォームコンセプト詳細
-│   ├── existing_features.md # 既存「ぐらふい」機能リファレンス
-│   └── tool_implementation_guide.md # ツール実装ガイド
+│   └── existing_features.md # 既存「ぐらふい」機能リファレンス
 ├── sql/                    # データベース関連ファイル
 │   ├── schema.sql          # 最新のスキーマ定義
-│   ├── changes.md          # 変更の簡易記録
-│   └── scripts/            # 実行したSQLスクリプト
-│       └── user_profiles.sql # ユーザープロファイルテーブル作成
+│   ├── changes.md          # データベース変更履歴
+│   └── scripts/            # 実行用SQLスクリプト
 ├── src/                    # ソースコード
 │   ├── app/                # Next.js App Router
 │   │   ├── auth/           # 認証関連のルート
@@ -112,16 +115,18 @@ graph_e_rc2/
 │   │   ├── signup/         # サインアップページ
 │   │   ├── chat/           # チャット機能
 │   │   ├── games/          # ゲーム機能
-│   │   └── tools/          # ツール機能（既存+新規）
+│   │   └── admin/          # 管理者機能
 │   ├── components/         # 共通コンポーネント
-│   │   ├── auth/           # 認証関連のコンポーネント
-│   │   ├── tools/          # ツール関連コンポーネント
-│   │   └── ui/             # 共通UIコンポーネント
-│   └── lib/                # ユーティリティと共通ロジック
-│       ├── supabase.ts     # Supabase設定
-│       └── tools/          # ツール関連ユーティリティ
+│   │   ├── auth/           # 認証関連コンポーネント
+│   │   ├── ui/             # 共通UIコンポーネント
+│   │   └── Header.tsx      # ヘッダーコンポーネント
+│   ├── hooks/              # カスタムフック
+│   │   └── useUserRole.ts  # ユーザーロール管理フック
+│   └── lib/                # ユーティリティ
+│       └── supabase.ts     # Supabase設定
 ├── public/                 # 静的ファイル
 ├── config/                 # 設定ファイル
+├── bkup/                   # バックアップファイル
 ├── docker-compose.yml      # Docker Compose設定
 ├── Dockerfile              # Dockerビルド設定
 └── .env.example            # 環境変数サンプル
@@ -129,83 +134,136 @@ graph_e_rc2/
 
 ## 実装状況
 
-### 完了済み
-- 基本プロジェクト構造の設定
-- Docker開発環境の構築
-- ユーザー認証機能（サインアップ、ログイン、ログアウト）
-- 認証保護されたルート
-- ユーザー属性管理データベース設計
+### 完了済み機能
+✅ 基本プロジェクト構造のセットアップ  
+✅ Docker開発環境の構築  
+✅ ユーザー認証システム（サインアップ、ログイン、ログアウト）  
+✅ 認証保護されたルート（ProtectedRoute）  
+✅ ユーザー属性管理（ロールベースのアクセス制御）  
+✅ 管理者ダッシュボードの基本UI  
+✅ RLSポリシーの設定と修正  
 
-### 進行中
+### 進行中の機能
+🔄 リアルタイムチャット機能の実装  
+🔄 既存「ぐらふい」ツールの移植  
+🔄 基本的な共有機能の開発  
+🔄 オンライン状態表示機能  
+
+### 今後の実装予定
+📅 ハーモノグラフツールの移植  
+📅 ライフゲームの移植  
+📅 惑星軌道ツールの移植  
+📅 JSON整形、QRコード生成などのユーティリティツール  
+📅 有料機能（Pro機能）の実装  
+📅 チーム機能と協働ツールの開発  
+
+## 開発ロードマップ
+
+### 第1フェーズ（基盤構築）- 現在進行中
+- 基本認証システム（完了）
 - リアルタイムチャット機能
-- 既存「ぐらふい」ツールの移植
-- 基本的な共有機能
-- オンライン状態表示
-- 通知システム
-
-### 今後の予定
-- ハーモノグラフツールの移植
-- ライフゲームの移植
-- 惑星軌道ツールの移植
-- 新規ユーティリティツールの実装
-- 有料機能の設計と実装
-
-## ロードマップ
-
-### 第1フェーズ（基盤構築）
-- 基本認証システムの完成
-- シンプルなチャット機能
-- 既存「ぐらふい」ツールの移植（ハーモノグラフ、ライフゲーム）
-- 基本的なツール（JSON整形、QRコード生成など）
+- 最初の「ぐらふい」ツール2つの移植（ハーモノグラフ、ライフゲーム）
+- 基本的なユーティリティツール
 
 ### 第2フェーズ（機能拡充）
 - 追加ツールの移植と実装
 - 基本的な共有機能
-- 初期の有料機能（高度なチャット機能、プレミアムツール）
+- プロファイル機能の強化
+- 初期の有料機能
 
 ### 第3フェーズ（収益化強化）
-- チーム機能（プライベートルーム、高度な権限管理）
-- 高度な協働ツール（プロジェクト管理機能など）
-- プレミアムツール拡張（AI支援機能、高度なデータ分析）
+- チーム機能
+- 高度な協働ツール
+- プレミアムツール拡張
 
-## ngrokを使った外部公開
+## 開発ガイド
 
-開発中のアプリケーションを一時的に外部公開する必要がある場合、ngrokを使用します。
+### データベース操作
 
-1. Docker Composeでngrokサービスも起動されます
-2. ngrok管理パネル（http://localhost:4040）で発行されたURLを確認
-3. 発行されたURLを使用して外部からアプリケーションにアクセス可能
+#### テーブル作成方法
+1. `/sql/scripts/` ディレクトリに新しいSQLファイルを作成
+2. Supabaseダッシュボードでスクリプトを実行
+3. `/sql/changes.md` に変更内容を記録
+4. `/sql/schema.sql` を更新
 
-## デプロイ注意事項
+#### RLSポリシー設定
+- 各テーブルに適切なRLSポリシーを設定
+- 基本方針: ユーザーは自分のデータのみアクセス可能、管理者はすべてのデータにアクセス可能
+
+### 認証関連の開発
+
+#### 保護されたルートの作成
+```tsx
+'use client';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
+
+export default function ProtectedPage() {
+  return (
+    <ProtectedRoute>
+      <div>保護されたコンテンツ</div>
+    </ProtectedRoute>
+  );
+}
+```
+
+#### ロールベースのアクセス制御
+```tsx
+import { AdminOnly } from '@/components/auth/role';
+
+export default function AdminPage() {
+  return (
+    <AdminOnly redirect={true}>
+      <div>管理者専用コンテンツ</div>
+    </AdminOnly>
+  );
+}
+```
+
+### ngrokを使った外部公開
+
+アプリケーションを一時的に外部公開する場合：
+
+1. Dockerが起動していることを確認（`docker-compose up -d`）
+2. ngrok管理パネル（http://localhost:4040）にアクセス
+3. 発行されたURLを使用して外部からアプリケーションにアクセス
+
+### コードスタイル
+- コンポーネントは機能ごとにディレクトリ分け
+- 状態管理は基本的にReactの標準機能を使用
+- TailwindCSSを使用したスタイリング
+- TypeScriptの型定義は厳密に行う
+
+## デプロイガイド
 
 ### Cloudflare Pagesへのデプロイ
 
-Cloudflare Pagesにデプロイする際の注意点：
+#### 準備
+1. Cloudflareアカウントを作成
+2. 新しいPagesプロジェクトを設定
 
+#### ビルド設定
+- ビルドコマンド: `npm run build`
+- 出力ディレクトリ: `.next`
+- Node.jsバージョン: `18.x`以上
+
+#### 環境変数設定
+必要な環境変数:
+- `NEXT_PUBLIC_SUPABASE_URL`: 本番環境用SupabaseプロジェクトのURL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: 本番環境用Supabaseの匿名キー
+
+#### 注意事項
 1. **クライアントコンポーネントの制約**
-   - `useSearchParams`や`usePathname`などのクライアントサイドフックを使用する場合は、必ず`Suspense`でラップする必要があります
-   - これらのフックは別のクライアントコンポーネントに分離し、親コンポーネントから`Suspense`でラップすることを推奨します
+   - `useSearchParams`や`usePathname`などのクライアントサイドフックを使用する場合は、`Suspense`でラップする
 
 2. **Edge Runtime対応**
-   - 動的なAPI routes（route handlers）は、Edge Runtimeとして設定する必要があります
-   - 各route.tsファイルに以下の行を追加してください:
-     ```typescript
-     export const runtime = 'edge';
-     ```
-   - これはCloudflare Workersの環境で実行するために必要な設定です
+   - 動的なAPI routes（route handlers）は、Edge Runtimeとして設定
+   ```typescript
+   export const runtime = 'edge';
+   ```
 
-3. **環境変数の設定**
-   - Cloudflare Pagesの環境変数設定でSupabaseの認証情報を設定する必要があります
-   - 本番環境用のAPIキーとURLを使用してください（開発環境のものとは分けることを推奨）
-
-4. **ビルド設定**
-   - ビルドコマンド: `npm run build`
-   - ビルド出力ディレクトリ: `.next`
-   - Node.jsバージョン: `18.x`または最新の安定版
-
-5. **デプロイ時の確認事項**
-   - デプロイ前にローカルで`npm run build`を実行してビルドエラーがないか確認
-   - 特に認証関連のリダイレクトURLが本番環境のURLになっているか確認
+3. **デプロイ前の確認**
+   - ローカルでビルドテストを実行（`npm run build`）
+   - 認証リダイレクトURLが本番環境用になっているか確認
 
 ---
 
@@ -213,11 +271,23 @@ Cloudflare Pagesにデプロイする際の注意点：
 
 A freemium social platform that integrates real-time chat, board games, interactive visualizations and utility tools. This project inherits features from the existing "ぐらふい" (Graph-e) project and extends them further.
 
+## Table of Contents
+
+- [Project Overview](#project-overview)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Development Environment Setup](#development-environment-setup)
+- [Project Structure](#project-structure)
+- [Implementation Status](#implementation-status)
+- [Development Roadmap](#development-roadmap)
+- [Development Guide](#development-guide)
+- [Deployment Guide](#deployment-guide)
+
 ## Project Overview
 
 This project is a real-time interactive platform built using Next.js, Supabase, Docker, and Cloudflare Pages. Users can communicate through real-time chat while enjoying visual simulations, board games, and using/sharing useful tools. It adopts a freemium model, offering basic features for free and advanced features as paid plans.
 
-## Main Features
+## Features
 
 ### Inherited "ぐらふい" Features
 - **Harmonograph**: Beautiful geometric patterns created by pendulum movements
@@ -241,27 +311,15 @@ For a detailed feature map, please refer to `docs/platform_mindmap.md`.
 
 ## Tech Stack
 
-- **Frontend**: Next.js (React)
+- **Frontend**: Next.js 14.1.3 (React 18), TailwindCSS
 - **Backend**: Next.js `use server` functionality + Supabase API
 - **Database**: Supabase (PostgreSQL)
 - **Real-time Features**: Supabase Realtime Subscriptions
-- **Development Environment**: Docker
-- **Deployment Environment**: Cloudflare Pages
 - **Authentication**: Supabase Auth
+- **Development Environment**: Docker, Docker Compose
+- **Deployment Environment**: Cloudflare Pages
+- **Language**: TypeScript
 - **Local Tunneling**: ngrok (exposing local development environment)
-
-## Database Design
-
-### Main Tables
-- **user_profiles**: User attribute management (roles and plan information)
-  - Role types: admin, developer, free_user, pro_user
-  - Plan types: free, pro, enterprise
-  - Script: `/sql/scripts/user_profiles.sql`
-
-### Database Management
-- SQL scripts are managed in the `/sql` directory
-- Change history is recorded in `/sql/changes.md`
-- Latest schema can be found in `/sql/schema.sql`
 
 ## Development Environment Setup
 
@@ -286,36 +344,39 @@ For a detailed feature map, please refer to `docs/platform_mindmap.md`.
    # Edit the .env file to set necessary environment variables
    ```
 
+   Required environment variables:
+   - `NEXT_PUBLIC_SUPABASE_URL`: Supabase project URL
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Supabase anonymous key
+   - `NGROK_AUTHTOKEN`: ngrok authentication token (for external access)
+
 3. Build and start Docker containers
    ```bash
    docker-compose up -d
    ```
 
 4. Database Setup
-   ```
-   # Run /sql/scripts/user_profiles.sql in Supabase dashboard
-   ```
+   - Log in to Supabase dashboard
+   - Open SQL Editor
+   - Execute the contents of `/sql/scripts/user_profiles.sql`
 
 5. Access the application
    ```
-   http://localhost:3000  # Local access
+   http://localhost:3000  # Main application
    http://localhost:4040  # ngrok admin panel (for checking public URL)
    ```
 
-## Directory Structure
+## Project Structure
 
 ```
 graph_e_rc2/
 ├── docs/                   # Project design documents
 │   ├── platform_mindmap.md # Feature mind map
 │   ├── platform_concept.md # Platform concept details
-│   ├── existing_features.md # Existing "ぐらふい" features reference
-│   └── tool_implementation_guide.md # Tool implementation guide
+│   └── existing_features.md # Existing "ぐらふい" features reference
 ├── sql/                    # Database related files
 │   ├── schema.sql          # Latest schema definition
-│   ├── changes.md          # Change history record
-│   └── scripts/            # SQL scripts executed
-│       └── user_profiles.sql # User profile table creation
+│   ├── changes.md          # Database change history
+│   └── scripts/            # SQL scripts for execution
 ├── src/                    # Source code
 │   ├── app/                # Next.js App Router
 │   │   ├── auth/           # Authentication-related routes
@@ -323,16 +384,18 @@ graph_e_rc2/
 │   │   ├── signup/         # Signup page
 │   │   ├── chat/           # Chat functionality
 │   │   ├── games/          # Games functionality
-│   │   └── tools/          # Tool functionality (existing + new)
+│   │   └── admin/          # Admin functionality
 │   ├── components/         # Common components
 │   │   ├── auth/           # Authentication-related components
-│   │   ├── tools/          # Tool-related components
-│   │   └── ui/             # Common UI components
-│   └── lib/                # Utilities and common logic
-│       ├── supabase.ts     # Supabase configuration
-│       └── tools/          # Tool-related utilities
+│   │   ├── ui/             # Common UI components
+│   │   └── Header.tsx      # Header component
+│   ├── hooks/              # Custom hooks
+│   │   └── useUserRole.ts  # User role management hook
+│   └── lib/                # Utilities
+│       └── supabase.ts     # Supabase configuration
 ├── public/                 # Static files
 ├── config/                 # Configuration files
+├── bkup/                   # Backup files
 ├── docker-compose.yml      # Docker Compose configuration
 ├── Dockerfile              # Docker build configuration
 └── .env.example            # Sample environment variables
@@ -340,80 +403,133 @@ graph_e_rc2/
 
 ## Implementation Status
 
-### Completed
-- Basic project structure setup
-- Docker development environment
-- User authentication (signup, login, logout)
-- Protected routes
-- User attribute management database design
+### Completed Features
+✅ Basic project structure setup  
+✅ Docker development environment  
+✅ User authentication system (signup, login, logout)  
+✅ Protected routes (ProtectedRoute)  
+✅ User attribute management (role-based access control)  
+✅ Admin dashboard basic UI  
+✅ RLS policy configuration and fixes  
 
 ### In Progress
-- Real-time chat functionality
-- Migration of existing "ぐらふい" tools
-- Basic sharing functionality
-- Online status display
-- Notification system
+🔄 Real-time chat functionality implementation  
+🔄 Migration of existing "ぐらふい" tools  
+🔄 Basic sharing functionality development  
+🔄 Online status display  
 
 ### Planned
-- Integration of Harmonograph tool
-- Integration of Game of Life
-- Integration of Planetary Orbit tool
-- Implementation of new utility tools
-- Design and implementation of paid features
+📅 Harmonograph tool migration  
+📅 Game of Life migration  
+📅 Planetary Orbit tool migration  
+📅 Utility tools (JSON formatter, QR code generator, etc.)  
+📅 Paid features (Pro features) implementation  
+📅 Team features and collaboration tools development  
 
-## Roadmap
+## Development Roadmap
 
-### Phase 1 (Foundation)
-- Complete basic authentication system
-- Simple chat functionality
-- Migration of existing "ぐらふい" tools (Harmonograph, Game of Life)
-- Basic tools (JSON formatter, QR code generator, etc.)
+### Phase 1 (Foundation) - Current
+- Basic authentication system (Completed)
+- Real-time chat functionality
+- First two "ぐらふい" tools migration (Harmonograph, Game of Life)
+- Basic utility tools
 
 ### Phase 2 (Feature Expansion)
 - Additional tools migration and implementation
 - Basic sharing functionality
-- Initial paid features (advanced chat features, premium tools)
+- Profile feature enhancement
+- Initial paid features
 
 ### Phase 3 (Monetization Enhancement)
-- Team features (private rooms, advanced permission management)
-- Advanced collaboration tools (project management features, etc.)
-- Premium tool expansion (AI assistance features, advanced data analysis)
+- Team features
+- Advanced collaboration tools
+- Premium tool expansion
 
-## External Access with ngrok
+## Development Guide
 
-When you need to temporarily expose your development application externally:
+### Database Operations
 
-1. The ngrok service is started with Docker Compose
-2. Check the issued URL on the ngrok admin panel (http://localhost:4040)
+#### Creating Tables
+1. Create a new SQL file in the `/sql/scripts/` directory
+2. Execute the script in the Supabase dashboard
+3. Record the changes in `/sql/changes.md`
+4. Update `/sql/schema.sql`
+
+#### RLS Policy Configuration
+- Set appropriate RLS policies for each table
+- Basic principle: Users can only access their own data, administrators can access all data
+
+### Authentication Development
+
+#### Creating Protected Routes
+```tsx
+'use client';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
+
+export default function ProtectedPage() {
+  return (
+    <ProtectedRoute>
+      <div>Protected Content</div>
+    </ProtectedRoute>
+  );
+}
+```
+
+#### Role-Based Access Control
+```tsx
+import { AdminOnly } from '@/components/auth/role';
+
+export default function AdminPage() {
+  return (
+    <AdminOnly redirect={true}>
+      <div>Admin Only Content</div>
+    </AdminOnly>
+  );
+}
+```
+
+### External Access with ngrok
+
+To temporarily expose your application externally:
+
+1. Ensure Docker is running (`docker-compose up -d`)
+2. Access the ngrok admin panel (http://localhost:4040)
 3. Use the issued URL to access your application from external sources
 
-## Deployment Notes
+### Code Style
+- Components are organized by functionality
+- State management primarily uses React's standard features
+- Styling with TailwindCSS
+- Strict TypeScript type definitions
+
+## Deployment Guide
 
 ### Deploying to Cloudflare Pages
 
-Important notes for deploying to Cloudflare Pages:
+#### Preparation
+1. Create a Cloudflare account
+2. Set up a new Pages project
 
+#### Build Settings
+- Build command: `npm run build`
+- Output directory: `.next`
+- Node.js version: `18.x` or higher
+
+#### Environment Variables
+Required environment variables:
+- `NEXT_PUBLIC_SUPABASE_URL`: Supabase project URL for production
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Supabase anonymous key for production
+
+#### Important Notes
 1. **Client Component Constraints**
    - Hooks like `useSearchParams` and `usePathname` must be wrapped in a `Suspense` boundary
-   - It's recommended to separate these hooks into separate client components and wrap them with `Suspense` from the parent component
 
 2. **Edge Runtime Configuration**
    - Dynamic API routes (route handlers) must be configured to run with the Edge Runtime
-   - Add the following line to each route.ts file:
-     ```typescript
-     export const runtime = 'edge';
-     ```
-   - This configuration is required for execution in the Cloudflare Workers environment
+   ```typescript
+   export const runtime = 'edge';
+   ```
 
-3. **Environment Variables**
-   - Set Supabase authentication information in Cloudflare Pages environment variables
-   - Use production API keys and URLs (recommended to keep them separate from development ones)
-
-4. **Build Settings**
-   - Build command: `npm run build`
-   - Build output directory: `.next`
-   - Node.js version: `18.x` or the latest stable version
-
-5. **Pre-deployment Checklist**
-   - Run `npm run build` locally to check for build errors before deploying
+3. **Pre-deployment Checklist**
+   - Run build test locally (`npm run build`)
    - Verify that authentication redirect URLs are set to production URLs
