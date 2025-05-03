@@ -89,6 +89,7 @@
    - Supabaseダッシュボードにログイン
    - SQLエディタを開く
    - `/sql/scripts/user_profiles.sql` の内容を実行
+   - 必要に応じて `/sql/scripts/update_user_profiles.sql` を実行
 
 5. アプリケーションにアクセスする
    ```
@@ -103,28 +104,39 @@ graph_e_rc2/
 ├── docs/                   # プロジェクト設計ドキュメント
 │   ├── platform_mindmap.md # 機能マインドマップ
 │   ├── platform_concept.md # プラットフォームコンセプト詳細
-│   └── existing_features.md # 既存「ぐらふい」機能リファレンス
+│   ├── existing_features.md # 既存「ぐらふい」機能リファレンス
+│   └── supabase_storage_setup.md # Supabaseストレージ設定手順
 ├── sql/                    # データベース関連ファイル
 │   ├── schema.sql          # 最新のスキーマ定義
 │   ├── changes.md          # データベース変更履歴
 │   └── scripts/            # 実行用SQLスクリプト
 ├── src/                    # ソースコード
 │   ├── app/                # Next.js App Router
+│   │   ├── admin/          # 管理者機能
 │   │   ├── auth/           # 認証関連のルート
-│   │   ├── login/          # ログインページ
-│   │   ├── signup/         # サインアップページ
 │   │   ├── chat/           # チャット機能
 │   │   ├── games/          # ゲーム機能
-│   │   └── admin/          # 管理者機能
+│   │   ├── login/          # ログインページ
+│   │   ├── settings/       # 設定画面
+│   │   │   └── profile/    # プロフィール設定
+│   │   └── signup/         # サインアップページ
 │   ├── components/         # 共通コンポーネント
 │   │   ├── auth/           # 認証関連コンポーネント
+│   │   ├── profile/        # プロフィール関連コンポーネント
 │   │   ├── ui/             # 共通UIコンポーネント
 │   │   └── Header.tsx      # ヘッダーコンポーネント
+│   ├── config/             # 設定ファイル
+│   │   └── avatars.ts      # アバター設定
 │   ├── hooks/              # カスタムフック
-│   │   └── useUserRole.ts  # ユーザーロール管理フック
-│   └── lib/                # ユーティリティ
-│       └── supabase.ts     # Supabase設定
+│   │   ├── useUserRole.ts  # ユーザーロール管理フック
+│   │   └── useProfile.ts   # プロフィール管理フック
+│   ├── lib/                # ユーティリティ
+│   │   └── supabase.ts     # Supabase設定
+│   └── types/              # 型定義
+│       └── profile.ts      # プロフィール関連の型定義
 ├── public/                 # 静的ファイル
+│   └── avatars/            # アバター画像
+│       └── samples/        # サンプルアバター
 ├── config/                 # 設定ファイル
 ├── bkup/                   # バックアップファイル
 ├── docker-compose.yml      # Docker Compose設定
@@ -142,12 +154,14 @@ graph_e_rc2/
 ✅ ユーザー属性管理（ロールベースのアクセス制御）  
 ✅ 管理者ダッシュボードの基本UI  
 ✅ RLSポリシーの設定と修正  
+✅ ユーザープロフィール機能（表示名、ユーザーID、自己紹介文）  
+✅ プロフィール画像機能（サンプルアバター選択、有料ユーザー向けカスタムアバター）  
+✅ オンラインステータス管理（オンライン、オフライン、取り込み中）  
 
 ### 進行中の機能
 🔄 リアルタイムチャット機能の実装  
 🔄 既存「ぐらふい」ツールの移植  
 🔄 基本的な共有機能の開発  
-🔄 オンライン状態表示機能  
 
 ### 今後の実装予定
 📅 ハーモノグラフツールの移植  
@@ -161,6 +175,7 @@ graph_e_rc2/
 
 ### 第1フェーズ（基盤構築）- 現在進行中
 - 基本認証システム（完了）
+- ユーザープロフィール機能（完了）
 - リアルタイムチャット機能
 - 最初の「ぐらふい」ツール2つの移植（ハーモノグラフ、ライフゲーム）
 - 基本的なユーティリティツール
@@ -189,6 +204,47 @@ graph_e_rc2/
 #### RLSポリシー設定
 - 各テーブルに適切なRLSポリシーを設定
 - 基本方針: ユーザーは自分のデータのみアクセス可能、管理者はすべてのデータにアクセス可能
+
+### プロフィール機能の使用方法
+
+#### プロフィール情報の取得
+```tsx
+import { useProfile } from '@/hooks/useProfile';
+
+function MyComponent() {
+  const { profile, loading, error } = useProfile();
+  
+  if (loading) return <div>読み込み中...</div>;
+  if (error) return <div>エラー: {error}</div>;
+  
+  return (
+    <div>
+      <h1>{profile?.display_name || 'ゲスト'}</h1>
+      {profile?.username && <p>@{profile.username}</p>}
+    </div>
+  );
+}
+```
+
+#### プロフィールカードの使用
+```tsx
+import ProfileCard from '@/components/profile/ProfileCard';
+
+function UsersList({ users }) {
+  return (
+    <div>
+      {users.map(user => (
+        <ProfileCard 
+          key={user.id} 
+          profile={user} 
+          showStatus 
+          showUsername 
+        />
+      ))}
+    </div>
+  );
+}
+```
 
 ### 認証関連の開発
 
@@ -358,6 +414,7 @@ For a detailed feature map, please refer to `docs/platform_mindmap.md`.
    - Log in to Supabase dashboard
    - Open SQL Editor
    - Execute the contents of `/sql/scripts/user_profiles.sql`
+   - If needed, execute `/sql/scripts/update_user_profiles.sql`
 
 5. Access the application
    ```
@@ -372,28 +429,39 @@ graph_e_rc2/
 ├── docs/                   # Project design documents
 │   ├── platform_mindmap.md # Feature mind map
 │   ├── platform_concept.md # Platform concept details
-│   └── existing_features.md # Existing "ぐらふい" features reference
+│   ├── existing_features.md # Existing "ぐらふい" features reference
+│   └── supabase_storage_setup.md # Supabase storage setup guide
 ├── sql/                    # Database related files
 │   ├── schema.sql          # Latest schema definition
 │   ├── changes.md          # Database change history
 │   └── scripts/            # SQL scripts for execution
 ├── src/                    # Source code
 │   ├── app/                # Next.js App Router
+│   │   ├── admin/          # Admin functionality
 │   │   ├── auth/           # Authentication-related routes
-│   │   ├── login/          # Login page
-│   │   ├── signup/         # Signup page
 │   │   ├── chat/           # Chat functionality
 │   │   ├── games/          # Games functionality
-│   │   └── admin/          # Admin functionality
+│   │   ├── login/          # Login page
+│   │   ├── settings/       # Settings pages
+│   │   │   └── profile/    # Profile settings
+│   │   └── signup/         # Signup page
 │   ├── components/         # Common components
 │   │   ├── auth/           # Authentication-related components
+│   │   ├── profile/        # Profile-related components
 │   │   ├── ui/             # Common UI components
 │   │   └── Header.tsx      # Header component
+│   ├── config/             # Configuration files
+│   │   └── avatars.ts      # Avatar configuration
 │   ├── hooks/              # Custom hooks
-│   │   └── useUserRole.ts  # User role management hook
-│   └── lib/                # Utilities
-│       └── supabase.ts     # Supabase configuration
+│   │   ├── useUserRole.ts  # User role management hook
+│   │   └── useProfile.ts   # Profile management hook
+│   ├── lib/                # Utilities
+│   │   └── supabase.ts     # Supabase configuration
+│   └── types/              # Type definitions
+│       └── profile.ts      # Profile-related type definitions
 ├── public/                 # Static files
+│   └── avatars/            # Avatar images
+│       └── samples/        # Sample avatars
 ├── config/                 # Configuration files
 ├── bkup/                   # Backup files
 ├── docker-compose.yml      # Docker Compose configuration
@@ -411,12 +479,14 @@ graph_e_rc2/
 ✅ User attribute management (role-based access control)  
 ✅ Admin dashboard basic UI  
 ✅ RLS policy configuration and fixes  
+✅ User profile functionality (display name, username, bio)  
+✅ Profile image functionality (sample avatar selection, custom avatar for paid users)  
+✅ Online status management (online, offline, busy)  
 
 ### In Progress
 🔄 Real-time chat functionality implementation  
 🔄 Migration of existing "ぐらふい" tools  
 🔄 Basic sharing functionality development  
-🔄 Online status display  
 
 ### Planned
 📅 Harmonograph tool migration  
@@ -430,6 +500,7 @@ graph_e_rc2/
 
 ### Phase 1 (Foundation) - Current
 - Basic authentication system (Completed)
+- User profile functionality (Completed)
 - Real-time chat functionality
 - First two "ぐらふい" tools migration (Harmonograph, Game of Life)
 - Basic utility tools
@@ -458,6 +529,47 @@ graph_e_rc2/
 #### RLS Policy Configuration
 - Set appropriate RLS policies for each table
 - Basic principle: Users can only access their own data, administrators can access all data
+
+### Using Profile Features
+
+#### Getting Profile Information
+```tsx
+import { useProfile } from '@/hooks/useProfile';
+
+function MyComponent() {
+  const { profile, loading, error } = useProfile();
+  
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+  
+  return (
+    <div>
+      <h1>{profile?.display_name || 'Guest'}</h1>
+      {profile?.username && <p>@{profile.username}</p>}
+    </div>
+  );
+}
+```
+
+#### Using Profile Card
+```tsx
+import ProfileCard from '@/components/profile/ProfileCard';
+
+function UsersList({ users }) {
+  return (
+    <div>
+      {users.map(user => (
+        <ProfileCard 
+          key={user.id} 
+          profile={user} 
+          showStatus 
+          showUsername 
+        />
+      ))}
+    </div>
+  );
+}
+```
 
 ### Authentication Development
 

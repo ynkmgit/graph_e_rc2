@@ -15,13 +15,27 @@ CREATE TABLE public.user_profiles (
   plan_expires_at TIMESTAMP WITH TIME ZONE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL  -- 論理削除のための日時フィールド、NULLは削除されていないことを示す
+  deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL,  -- 論理削除のための日時フィールド、NULLは削除されていないことを示す
+  
+  -- プロフィール拡張フィールド
+  username TEXT UNIQUE,  -- @から始まる一意のID
+  bio TEXT,              -- 自己紹介文
+  avatar_type TEXT NOT NULL DEFAULT 'sample', -- 'sample'または'custom'
+  selected_avatar_id TEXT, -- サンプルアバターの場合、選択したアバターID
+  online_status TEXT NOT NULL DEFAULT 'offline', -- 'online', 'offline', 'busy'など
+  last_active_at TIMESTAMP WITH TIME ZONE, -- 最終アクティブ時間
+  
+  -- バリデーション用チェック制約
+  CONSTRAINT valid_username CHECK (username ~ '^[a-z0-9_]{3,20}$'), -- 小文字、数字、アンダースコアのみ、3-20文字
+  CONSTRAINT valid_avatar_type CHECK (avatar_type IN ('sample', 'custom'))
 );
 
 -- インデックス
 CREATE INDEX idx_user_profiles_role ON public.user_profiles(role);
 CREATE INDEX idx_user_profiles_plan_type ON public.user_profiles(plan_type);
 CREATE INDEX idx_user_profiles_deleted_at ON public.user_profiles(deleted_at);
+CREATE INDEX idx_user_profiles_username ON public.user_profiles(username);
+CREATE INDEX idx_user_profiles_online_status ON public.user_profiles(online_status);
 
 -- Row Level Security ポリシー
 ALTER TABLE public.user_profiles ENABLE ROW LEVEL SECURITY;
