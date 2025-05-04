@@ -38,6 +38,8 @@ export default function NoteForm({
     title: '',
     content: ''
   });
+  
+  const [showMarkdownHelp, setShowMarkdownHelp] = useState(false);
 
   // タグ関連のカスタムフック
   const { 
@@ -131,12 +133,39 @@ export default function NoteForm({
       </div>
       
       <div>
-        <label
-          htmlFor="content"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-        >
-          内容
-        </label>
+        <div className="flex justify-between items-center mb-1">
+          <label
+            htmlFor="content"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            内容 <span className="text-xs text-blue-600 dark:text-blue-400">(マークダウン対応)</span>
+          </label>
+          <button
+            type="button"
+            onClick={() => setShowMarkdownHelp(!showMarkdownHelp)}
+            className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+          >
+            {showMarkdownHelp ? 'ヘルプを閉じる' : 'マークダウンのヘルプを表示'}
+          </button>
+        </div>
+        
+        {showMarkdownHelp && (
+          <div className="mb-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700 text-sm">
+            <h4 className="font-medium mb-2">基本的なマークダウン書式</h4>
+            <ul className="space-y-1 list-disc pl-5">
+              <li><code className="bg-gray-100 dark:bg-gray-700 px-1 rounded"># 見出し1</code> - 見出しレベル1（最大）</li>
+              <li><code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">## 見出し2</code> - 見出しレベル2</li>
+              <li><code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">**太字**</code> - <strong>太字</strong></li>
+              <li><code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">*斜体*</code> - <em>斜体</em></li>
+              <li><code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">[リンクテキスト](https://example.com)</code> - リンク</li>
+              <li><code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">- 項目</code> - 箇条書きリスト</li>
+              <li><code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">1. 項目</code> - 番号付きリスト</li>
+              <li><code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">```<br/>コードブロック<br/>```</code> - コードブロック</li>
+              <li><code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">`インラインコード`</code> - インラインコード</li>
+            </ul>
+          </div>
+        )}
+        
         <textarea
           id="content"
           name="content"
@@ -144,7 +173,7 @@ export default function NoteForm({
           value={formData.content}
           onChange={handleChange}
           className="block w-full rounded-md border border-gray-300 dark:border-gray-600 p-2 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:ring-2 focus:ring-indigo-600 dark:focus:ring-indigo-500"
-          placeholder="メモの内容を入力"
+          placeholder="メモの内容を入力（マークダウン記法が使えます）"
           disabled={loading}
         />
         {errors.content && (

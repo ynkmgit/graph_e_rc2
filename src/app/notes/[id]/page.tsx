@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { useNotes } from '@/hooks/useNotes';
 import { useAuth } from '@/components/auth/AuthProvider';
 import TagBadge from '@/components/tags/TagBadge';
+import MarkdownRenderer from '@/components/markdown/MarkdownRenderer';
 
 export default function NotePage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -41,17 +42,6 @@ export default function NotePage({ params }: { params: { id: string } }) {
     } finally {
       setIsDeleting(false);
     }
-  };
-
-  // 改行をbrタグに変換するヘルパー関数
-  const formatContent = (content: string | null) => {
-    if (!content) return '';
-    return content.split('\n').map((line, i) => (
-      <span key={i}>
-        {line}
-        <br />
-      </span>
-    ));
   };
 
   return (
@@ -117,11 +107,8 @@ export default function NotePage({ params }: { params: { id: string } }) {
               )}
               
               <div className="prose prose-sm dark:prose-invert max-w-none pb-6 border-b dark:border-gray-700">
-                {note.content ? (
-                  <div className="whitespace-pre-wrap">{formatContent(note.content)}</div>
-                ) : (
-                  <p className="text-gray-400 dark:text-gray-500 italic">内容なし</p>
-                )}
+                {/* マークダウンレンダラーを使用 */}
+                <MarkdownRenderer content={note.content || ''} />
               </div>
               
               {user && note.user_id === user.id && (

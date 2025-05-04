@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { Note, NoteFormInput } from '@/types/note';
 import { useTags } from '@/hooks/useTags';
+import { Tag } from '@/types/tag';
 
 export const useNotes = (noteId?: string) => {
   const { user } = useAuth();
@@ -51,7 +52,7 @@ export const useNotes = (noteId?: string) => {
           
           return {
             ...noteItem,
-            tags: tagData.map(item => item.tags)
+            tags: tagData.map(item => item.tags as unknown as Tag)
           };
         })
       );
@@ -91,7 +92,7 @@ export const useNotes = (noteId?: string) => {
       // タグ情報を付与
       const noteWithTags = {
         ...noteData,
-        tags: tagData.map(item => item.tags)
+        tags: tagData.map(item => item.tags as unknown as Tag)
       };
       
       setNote(noteWithTags as Note);
@@ -133,7 +134,7 @@ export const useNotes = (noteId?: string) => {
           
           return {
             ...noteItem,
-            tags: tagData.map(item => item.tags)
+            tags: tagData.map(item => item.tags as unknown as Tag)
           };
         })
       );
@@ -344,7 +345,7 @@ export const useNotes = (noteId?: string) => {
           
           return {
             ...noteItem,
-            tags: tagData.map(item => item.tags)
+            tags: tagData.map(item => item.tags as unknown as Tag)
           };
         })
       );

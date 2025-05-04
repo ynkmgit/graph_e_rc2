@@ -23,11 +23,16 @@ export default function NoteCard({
   showAuthor = false,
   authorName
 }: NoteCardProps) {
-  // 内容のプレビュー用に短縮する（最大100文字）
+  // 内容のプレビュー用に短縮する（Markdownタグを除去し、最大100文字）
   const contentPreview = note.content 
-    ? note.content.length > 100 
-      ? `${note.content.substring(0, 100)}...` 
-      : note.content
+    ? note.content
+        .replace(/#{1,6}\s+/g, '') // 見出しタグを除去
+        .replace(/\*\*|\*|~~|__/g, '') // 強調タグを除去
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // リンクの表示テキストだけ残す
+        .replace(/```[\s\S]*?```/g, '[コードブロック]') // コードブロックを簡略化
+        .replace(/`([^`]+)`/g, '$1') // インラインコードを簡略化
+        .replace(/\n/g, ' ') // 改行をスペースに変換
+        .substring(0, 100) + (note.content.length > 100 ? '...' : '')
     : '';
 
   // 日付のフォーマット

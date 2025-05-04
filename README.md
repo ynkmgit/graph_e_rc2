@@ -29,7 +29,7 @@
 
 ### 新たに開発する機能
 - **リアルタイムチャット**: ユーザー間でのテキストコミュニケーション
-- **メモ機能**: ユーザーごとのメモ作成・管理、公開・非公開設定、タグ付け
+- **メモ機能**: ユーザーごとのメモ作成・管理、公開・非公開設定、タグ付け、マークダウン対応
 - **ユーティリティツール**: JSON整形、QRコード生成など
 - **共有・協働機能**: ツールの共同編集とリアルタイム共有
 - **ユーザープロフィール**: カスタマイズ可能なプロフィール
@@ -52,6 +52,7 @@
 - **デプロイ環境**: Cloudflare Pages
 - **言語**: TypeScript
 - **ローカル公開**: ngrok（開発環境の外部公開）
+- **その他ライブラリ**: react-markdown、remark-gfm（マークダウン対応）
 
 ## 開発環境のセットアップ
 
@@ -131,6 +132,7 @@ graph_e_rc2/
 │   │   ├── auth/           # 認証関連コンポーネント
 │   │   ├── notes/          # メモ関連コンポーネント
 │   │   ├── tags/           # タグ関連コンポーネント
+│   │   ├── markdown/       # マークダウン関連コンポーネント
 │   │   ├── profile/        # プロフィール関連コンポーネント
 │   │   ├── ui/             # 共通UIコンポーネント
 │   │   └── Header.tsx      # ヘッダーコンポーネント
@@ -172,11 +174,14 @@ graph_e_rc2/
 ✅ オンラインステータス管理（オンライン、オフライン、取り込み中）  
 ✅ メモ機能（作成、編集、削除、公開/非公開設定）  
 ✅ タグ機能（タグの作成、編集、削除、メモへのタグ付け）  
+✅ マークダウン対応メモ（リッチテキスト編集と表示）  
 
 ### 進行中の機能
 🔄 リアルタイムチャット機能の実装  
 🔄 既存「ぐらふい」ツールの移植  
 🔄 基本的な共有機能の開発  
+🔄 メモの検索機能の実装  
+🔄 メモの画像添付機能の実装  
 
 ### 今後の実装予定
 📅 ハーモノグラフツールの移植  
@@ -193,6 +198,7 @@ graph_e_rc2/
 - ユーザープロフィール機能（完了）
 - メモ機能（完了）
 - タグ機能（完了）
+- マークダウン対応（完了）
 - リアルタイムチャット機能
 - 最初の「ぐらふい」ツール2つの移植（ハーモノグラフ、ライフゲーム）
 - 基本的なユーティリティツール
@@ -314,6 +320,19 @@ function CreateNoteComponent() {
       loading={false}
       mode="create"
     />
+  );
+}
+```
+
+#### マークダウンレンダラーの使用
+```tsx
+import MarkdownRenderer from '@/components/markdown/MarkdownRenderer';
+
+function NoteContentDisplay({ content }) {
+  return (
+    <div className="prose dark:prose-invert max-w-none">
+      <MarkdownRenderer content={content} />
+    </div>
   );
 }
 ```
@@ -456,464 +475,3 @@ export default function AdminPage() {
 3. **デプロイ前の確認**
    - ローカルでビルドテストを実行（`npm run build`）
    - 認証リダイレクトURLが本番環境用になっているか確認
-
----
-
-# Real-time Interactive Platform
-
-A freemium social platform that integrates real-time chat, board games, interactive visualizations and utility tools. This project inherits features from the existing "ぐらふい" (Graph-e) project and extends them further.
-
-## Table of Contents
-
-- [Project Overview](#project-overview)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Development Environment Setup](#development-environment-setup)
-- [Project Structure](#project-structure)
-- [Implementation Status](#implementation-status)
-- [Development Roadmap](#development-roadmap)
-- [Development Guide](#development-guide)
-- [Deployment Guide](#deployment-guide)
-
-## Project Overview
-
-This project is a real-time interactive platform built using Next.js, Supabase, Docker, and Cloudflare Pages. Users can communicate through real-time chat while enjoying visual simulations, board games, and using/sharing useful tools. It adopts a freemium model, offering basic features for free and advanced features as paid plans.
-
-## Features
-
-### Inherited "ぐらふい" Features
-- **Harmonograph**: Beautiful geometric patterns created by pendulum movements
-- **Game of Life**: Life simulation through cellular automaton
-- **Planetary Orbit (Dance of Stars)**: Visualization of planetary orbit patterns
-- **Euler's Formula 3D Graph**: 3D visualization of mathematical formula
-- **Other Tools**: Cross Graph, Survival Strategy Game, and more
-
-### Newly Developed Features
-- **Real-time Chat**: Text communication between users
-- **Notes Feature**: Create and manage notes with public/private settings and tagging
-- **Utility Tools**: JSON formatter, QR code generator, etc.
-- **Sharing & Collaboration**: Co-editing and real-time sharing of tools
-- **User Profiles**: Customizable profiles
-- **Content Gallery**: Sharing and browsing user creations
-
-### Free and Paid Features
-- **Free Features**: Basic tools, simple chat, basic sharing functionality
-- **Paid Features**: Advanced tool settings, unlimited history storage, team features, advanced collaboration tools
-
-For a detailed feature map, please refer to `docs/platform_mindmap.md`.
-
-## Tech Stack
-
-- **Frontend**: Next.js 14.1.3 (React 18), TailwindCSS
-- **Backend**: Next.js `use server` functionality + Supabase API
-- **Database**: Supabase (PostgreSQL)
-- **Real-time Features**: Supabase Realtime Subscriptions
-- **Authentication**: Supabase Auth
-- **Development Environment**: Docker, Docker Compose
-- **Deployment Environment**: Cloudflare Pages
-- **Language**: TypeScript
-- **Local Tunneling**: ngrok (exposing local development environment)
-
-## Development Environment Setup
-
-### Prerequisites
-
-- Docker and Docker Compose installed
-- Git installed
-- Supabase account created
-- ngrok account (free or paid plan)
-
-### Setup Steps
-
-1. Clone the repository
-   ```bash
-   git clone <repository-url>
-   cd graph_e_rc2
-   ```
-
-2. Configure environment variables
-   ```bash
-   cp .env.example .env
-   # Edit the .env file to set necessary environment variables
-   ```
-
-   Required environment variables:
-   - `NEXT_PUBLIC_SUPABASE_URL`: Supabase project URL
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Supabase anonymous key
-   - `NGROK_AUTHTOKEN`: ngrok authentication token (for external access)
-
-3. Build and start Docker containers
-   ```bash
-   docker-compose up -d
-   ```
-
-4. Database Setup
-   - Log in to Supabase dashboard
-   - Open SQL Editor
-   - Execute the contents of `/sql/scripts/user_profiles.sql`
-   - If needed, execute `/sql/scripts/notes_table.sql`
-   - If you want to use tags, execute `/sql/scripts/tags/tags_tables.sql`
-
-5. Access the application
-   ```
-   http://localhost:3000  # Main application
-   http://localhost:4040  # ngrok admin panel (for checking public URL)
-   ```
-
-## Project Structure
-
-```
-graph_e_rc2/
-├── docs/                   # Project design documents
-│   ├── platform_mindmap.md # Feature mind map
-│   ├── platform_concept.md # Platform concept details
-│   ├── existing_features.md # Existing "ぐらふい" features reference
-│   └── supabase_storage_setup.md # Supabase storage setup guide
-├── sql/                    # Database related files
-│   ├── schema.sql          # Latest schema definition
-│   ├── changes.md          # Database change history
-│   └── scripts/            # SQL scripts for execution
-├── src/                    # Source code
-│   ├── app/                # Next.js App Router
-│   │   ├── admin/          # Admin functionality
-│   │   ├── auth/           # Authentication-related routes
-│   │   ├── chat/           # Chat functionality
-│   │   ├── games/          # Games functionality
-│   │   ├── login/          # Login page
-│   │   ├── notes/          # Notes functionality
-│   │   │   ├── [id]/       # Note details and edit pages
-│   │   │   ├── new/        # New note creation page
-│   │   │   └── tags/       # Notes by tag
-│   │   ├── tags/           # Tag management
-│   │   ├── settings/       # Settings pages
-│   │   │   └── profile/    # Profile settings
-│   │   └── signup/         # Signup page
-│   ├── components/         # Common components
-│   │   ├── auth/           # Authentication-related components
-│   │   ├── notes/          # Notes-related components
-│   │   ├── tags/           # Tags-related components
-│   │   ├── profile/        # Profile-related components
-│   │   ├── ui/             # Common UI components
-│   │   └── Header.tsx      # Header component
-│   ├── config/             # Configuration files
-│   │   └── avatars.ts      # Avatar configuration
-│   ├── hooks/              # Custom hooks
-│   │   ├── useUserRole.ts  # User role management hook
-│   │   ├── useProfile.ts   # Profile management hook
-│   │   ├── useNotes.ts     # Notes management hook
-│   │   └── useTags.ts      # Tags management hook
-│   ├── lib/                # Utilities
-│   │   └── supabase.ts     # Supabase configuration
-│   └── types/              # Type definitions
-│       ├── profile.ts      # Profile-related type definitions
-│       ├── note.ts         # Notes-related type definitions
-│       └── tag.ts          # Tags-related type definitions
-├── public/                 # Static files
-│   └── avatars/            # Avatar images
-│       └── samples/        # Sample avatars
-├── config/                 # Configuration files
-├── bkup/                   # Backup files
-├── docker-compose.yml      # Docker Compose configuration
-├── Dockerfile              # Docker build configuration
-└── .env.example            # Sample environment variables
-```
-
-## Implementation Status
-
-### Completed Features
-✅ Basic project structure setup  
-✅ Docker development environment  
-✅ User authentication system (signup, login, logout)  
-✅ Protected routes (ProtectedRoute)  
-✅ User attribute management (role-based access control)  
-✅ Admin dashboard basic UI  
-✅ RLS policy configuration and fixes  
-✅ User profile functionality (display name, username, bio)  
-✅ Profile image functionality (sample avatar selection, custom avatar for paid users)  
-✅ Online status management (online, offline, busy)  
-✅ Notes functionality (create, edit, delete, public/private settings)  
-✅ Tags functionality (create, edit, delete, tagging notes)  
-
-### In Progress
-🔄 Real-time chat functionality implementation  
-🔄 Migration of existing "ぐらふい" tools  
-🔄 Basic sharing functionality development  
-
-### Planned
-📅 Harmonograph tool migration  
-📅 Game of Life migration  
-📅 Planetary Orbit tool migration  
-📅 Utility tools (JSON formatter, QR code generator, etc.)  
-📅 Paid features (Pro features) implementation  
-📅 Team features and collaboration tools development  
-
-## Development Roadmap
-
-### Phase 1 (Foundation) - Current
-- Basic authentication system (Completed)
-- User profile functionality (Completed)
-- Notes functionality (Completed)
-- Tags functionality (Completed)
-- Real-time chat functionality
-- First two "ぐらふい" tools migration (Harmonograph, Game of Life)
-- Basic utility tools
-
-### Phase 2 (Feature Expansion)
-- Additional tools migration and implementation
-- Basic sharing functionality
-- Profile feature enhancement
-- Initial paid features
-
-### Phase 3 (Monetization Enhancement)
-- Team features
-- Advanced collaboration tools
-- Premium tool expansion
-
-## Development Guide
-
-### Database Operations
-
-#### Creating Tables
-1. Create a new SQL file in the `/sql/scripts/` directory
-2. Execute the script in the Supabase dashboard
-3. Record the changes in `/sql/changes.md`
-4. Update `/sql/schema.sql`
-
-#### RLS Policy Configuration
-- Set appropriate RLS policies for each table
-- Basic principle: Users can only access their own data, administrators can access all data
-
-### Using Profile Features
-
-#### Getting Profile Information
-```tsx
-import { useProfile } from '@/hooks/useProfile';
-
-function MyComponent() {
-  const { profile, loading, error } = useProfile();
-  
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
-  
-  return (
-    <div>
-      <h1>{profile?.display_name || 'Guest'}</h1>
-      {profile?.username && <p>@{profile.username}</p>}
-    </div>
-  );
-}
-```
-
-#### Using Profile Card
-```tsx
-import ProfileCard from '@/components/profile/ProfileCard';
-
-function UsersList({ users }) {
-  return (
-    <div>
-      {users.map(user => (
-        <ProfileCard 
-          key={user.id} 
-          profile={user} 
-          showStatus 
-          showUsername 
-        />
-      ))}
-    </div>
-  );
-}
-```
-
-### Using Notes Feature
-
-#### Fetching and Displaying Notes
-```tsx
-import { useNotes } from '@/hooks/useNotes';
-
-function NotesListComponent() {
-  const { notes, loading, error } = useNotes();
-  
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
-  
-  return (
-    <div>
-      <h1>Notes List</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {notes.map(note => (
-          <NoteCard key={note.id} note={note} />
-        ))}
-      </div>
-    </div>
-  );
-}
-```
-
-#### Creating Notes (with tags)
-```tsx
-import { useNotes } from '@/hooks/useNotes';
-import { useTags } from '@/hooks/useTags';
-import { NoteFormInput } from '@/types/note';
-
-function CreateNoteComponent() {
-  const { createNote } = useNotes();
-  const { tags, createTag } = useTags();
-  
-  const handleSubmit = async (data: NoteFormInput) => {
-    const { success, error } = await createNote(data);
-    if (success) {
-      // Handle success
-    } else {
-      // Handle error
-    }
-  };
-  
-  return (
-    <NoteForm 
-      initialData={{ title: '', content: '', is_public: false, tagIds: [] }}
-      onSubmit={handleSubmit}
-      loading={false}
-      mode="create"
-    />
-  );
-}
-```
-
-### Using Tags Feature
-
-#### Fetching and Displaying Tags
-```tsx
-import { useTags } from '@/hooks/useTags';
-import TagBadge from '@/components/tags/TagBadge';
-
-function TagsListComponent() {
-  const { tags, loading, error } = useTags();
-  
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
-  
-  return (
-    <div>
-      <h1>Tags List</h1>
-      <div className="flex flex-wrap gap-2">
-        {tags.map(tag => (
-          <TagBadge key={tag.id} tag={tag} />
-        ))}
-      </div>
-    </div>
-  );
-}
-```
-
-#### Using Tag Selector
-```tsx
-import { useTags } from '@/hooks/useTags';
-import TagSelector from '@/components/tags/TagSelector';
-import { useState } from 'react';
-
-function TagSelectorComponent() {
-  const { tags, createTag } = useTags();
-  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
-  
-  return (
-    <TagSelector
-      availableTags={tags}
-      selectedTagIds={selectedTagIds}
-      onChange={setSelectedTagIds}
-      onCreateTag={createTag}
-    />
-  );
-}
-```
-
-#### Filtering Notes by Tag
-```tsx
-import { useNotes } from '@/hooks/useNotes';
-import { useRouter } from 'next/navigation';
-
-function FilterByTagComponent() {
-  const router = useRouter();
-  const { fetchNotesByTagId } = useNotes();
-  
-  const handleTagClick = (tagId: string) => {
-    router.push(`/notes/tags/${tagId}`);
-  };
-  
-  // ...
-}
-```
-
-### Authentication Development
-
-#### Creating Protected Routes
-```tsx
-'use client';
-import ProtectedRoute from '@/components/auth/ProtectedRoute';
-
-export default function ProtectedPage() {
-  return (
-    <ProtectedRoute>
-      <div>Protected Content</div>
-    </ProtectedRoute>
-  );
-}
-```
-
-#### Role-Based Access Control
-```tsx
-import { AdminOnly } from '@/components/auth/role';
-
-export default function AdminPage() {
-  return (
-    <AdminOnly redirect={true}>
-      <div>Admin Only Content</div>
-    </AdminOnly>
-  );
-}
-```
-
-### External Access with ngrok
-
-To temporarily expose your application externally:
-
-1. Ensure Docker is running (`docker-compose up -d`)
-2. Access the ngrok admin panel (http://localhost:4040)
-3. Use the issued URL to access your application from external sources
-
-### Code Style
-- Components are organized by functionality
-- State management primarily uses React's standard features
-- Styling with TailwindCSS
-- Strict TypeScript type definitions
-
-## Deployment Guide
-
-### Deploying to Cloudflare Pages
-
-#### Preparation
-1. Create a Cloudflare account
-2. Set up a new Pages project
-
-#### Build Settings
-- Build command: `npm run build`
-- Output directory: `.next`
-- Node.js version: `18.x` or higher
-
-#### Environment Variables
-Required environment variables:
-- `NEXT_PUBLIC_SUPABASE_URL`: Supabase project URL for production
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Supabase anonymous key for production
-
-#### Important Notes
-1. **Client Component Constraints**
-   - Hooks like `useSearchParams` and `usePathname` must be wrapped in a `Suspense` boundary
-
-2. **Edge Runtime Configuration**
-   - Dynamic API routes (route handlers) must be configured to run with the Edge Runtime
-   ```typescript
-   export const runtime = 'edge';
-   ```
-
-3. **Pre-deployment Checklist**
-   - Run build test locally (`npm run build`)
-   - Verify that authentication redirect URLs are set to production URLs

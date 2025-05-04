@@ -51,7 +51,8 @@ export const useTags = (noteId?: string) => {
       if (error) throw error;
       
       // tags.tag_idの形式で返されるので、整形する
-      const formattedTags = data.map(item => item.tags) as Tag[];
+      // 型エラー修正: 明示的にitemごとに型を変換する
+      const formattedTags = data.map(item => item.tags as unknown as Tag);
       setNoteTags(formattedTags);
     } catch (err: any) {
       console.error('メモのタグ取得エラー:', err);
@@ -229,7 +230,8 @@ export const useTags = (noteId?: string) => {
       if (error) throw error;
       
       // notes.note_idの形式で返されるので、整形する
-      const formattedNotes = data.map(item => item.notes) as Note[];
+      // 型エラー修正: 明示的にitemごとに型を変換する
+      const formattedNotes = data.map(item => item.notes as unknown as Note);
       
       // 削除されていないメモのみフィルタリング
       const activeNotes = formattedNotes.filter(note => !note.deleted_at);
