@@ -10,6 +10,9 @@ import { useNotes } from '@/hooks/useNotes';
 import { useTags } from '@/hooks/useTags';
 import { Tag } from '@/types/tag';
 
+// Cloudflare Pages用のEdge Runtime設定
+export const runtime = 'edge';
+
 export default function NotesByTagPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const { notes, loading, error, fetchNotesByTagId, deleteNote } = useNotes();

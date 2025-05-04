@@ -10,6 +10,9 @@ import { useNotes } from '@/hooks/useNotes';
 import { NoteFormInput } from '@/types/note';
 import { useAuth } from '@/components/auth/AuthProvider';
 
+// Cloudflare Pages用のEdge Runtime設定
+export const runtime = 'edge';
+
 export default function EditNotePage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const { user } = useAuth();

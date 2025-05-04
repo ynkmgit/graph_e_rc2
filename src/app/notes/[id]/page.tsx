@@ -10,6 +10,9 @@ import { useAuth } from '@/components/auth/AuthProvider';
 import TagBadge from '@/components/tags/TagBadge';
 import MarkdownRenderer from '@/components/markdown/MarkdownRenderer';
 
+// Cloudflare Pages用のEdge Runtime設定
+export const runtime = 'edge';
+
 export default function NotePage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const { user } = useAuth();
