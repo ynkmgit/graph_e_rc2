@@ -17,21 +17,16 @@ export default function Header() {
   const [showMenu, setShowMenu] = useState(false);
   const [showMobileNav, setShowMobileNav] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const [shouldRender, setShouldRender] = useState(true);
 
-  // 現在のパスがログインまたはサインアップページの場合はヘッダーを表示しない
-  if (pathname === '/login' || pathname === '/signup') {
-    return null;
-  }
-
-  // メニューの表示/非表示を切り替える
-  const toggleMenu = () => {
-    setShowMenu(!showMenu);
-  };
-
-  // モバイルナビゲーションの表示/非表示を切り替える
-  const toggleMobileNav = () => {
-    setShowMobileNav(!showMobileNav);
-  };
+  // 現在のパスがログインまたはサインアップページの場合はレンダリングしない
+  useEffect(() => {
+    if (pathname === '/login' || pathname === '/signup') {
+      setShouldRender(false);
+    } else {
+      setShouldRender(true);
+    }
+  }, [pathname]);
 
   // 画面外のクリックでメニューを閉じる
   useEffect(() => {
@@ -47,6 +42,16 @@ export default function Header() {
     };
   }, [menuRef]);
 
+  // メニューの表示/非表示を切り替える
+  const toggleMenu = () => {
+    setShowMenu(!showMenu);
+  };
+
+  // モバイルナビゲーションの表示/非表示を切り替える
+  const toggleMobileNav = () => {
+    setShowMobileNav(!showMobileNav);
+  };
+
   // アクティブなナビゲーションリンクのスタイル
   const getNavLinkStyle = (linkPath: string) => {
     const isActive = pathname === linkPath || pathname.startsWith(`${linkPath}/`);
@@ -54,6 +59,11 @@ export default function Header() {
       ? 'text-indigo-600 dark:text-indigo-400 font-medium'
       : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white';
   };
+
+  // ログインページなどではヘッダーを表示しない
+  if (!shouldRender) {
+    return null;
+  }
 
   return (
     <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
