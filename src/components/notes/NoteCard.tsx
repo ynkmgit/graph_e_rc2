@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Note } from '@/types/note';
+import TagBadge from '@/components/tags/TagBadge';
 
 interface NoteCardProps {
   note: Note;
@@ -61,6 +62,15 @@ export default function NoteCard({
           <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">
             作成者: {authorName}
           </p>
+        )}
+        
+        {/* タグ表示 */}
+        {note.tags && note.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mt-2">
+            {note.tags.map(tag => (
+              <TagBadge key={tag.id} tag={tag} />
+            ))}
+          </div>
         )}
       </CardHeader>
       <CardContent>

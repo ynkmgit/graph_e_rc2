@@ -30,7 +30,8 @@ export default function EditNotePage({ params }: { params: { id: string } }) {
   const initialData = {
     title: note?.title || '',
     content: note?.content || '',
-    is_public: note?.is_public || false
+    is_public: note?.is_public || false,
+    tagIds: note?.tags?.map(tag => tag.id) || []
   };
 
   const handleSubmit = async (data: NoteFormInput) => {
@@ -106,6 +107,7 @@ export default function EditNotePage({ params }: { params: { id: string } }) {
               onSubmit={handleSubmit}
               loading={loading}
               mode="edit"
+              noteId={params.id}
             />
           </div>
         )}

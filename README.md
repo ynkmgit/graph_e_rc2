@@ -29,7 +29,7 @@
 
 ### 新たに開発する機能
 - **リアルタイムチャット**: ユーザー間でのテキストコミュニケーション
-- **メモ機能**: ユーザーごとのメモ作成・管理、公開・非公開設定
+- **メモ機能**: ユーザーごとのメモ作成・管理、公開・非公開設定、タグ付け
 - **ユーティリティツール**: JSON整形、QRコード生成など
 - **共有・協働機能**: ツールの共同編集とリアルタイム共有
 - **ユーザープロフィール**: カスタマイズ可能なプロフィール
@@ -91,6 +91,7 @@
    - SQLエディタを開く
    - `/sql/scripts/user_profiles.sql` の内容を実行
    - 必要に応じて `/sql/scripts/notes_table.sql` を実行
+   - タグ機能を使用する場合は `/sql/scripts/tags/tags_tables.sql` を実行
 
 5. アプリケーションにアクセスする
    ```
@@ -120,13 +121,16 @@ graph_e_rc2/
 │   │   ├── login/          # ログインページ
 │   │   ├── notes/          # メモ機能
 │   │   │   ├── [id]/       # メモ詳細・編集ページ
-│   │   │   └── new/        # 新規メモ作成ページ
+│   │   │   ├── new/        # 新規メモ作成ページ
+│   │   │   └── tags/       # タグごとのメモ一覧
+│   │   ├── tags/           # タグ管理機能
 │   │   ├── settings/       # 設定画面
 │   │   │   └── profile/    # プロフィール設定
 │   │   └── signup/         # サインアップページ
 │   ├── components/         # 共通コンポーネント
 │   │   ├── auth/           # 認証関連コンポーネント
 │   │   ├── notes/          # メモ関連コンポーネント
+│   │   ├── tags/           # タグ関連コンポーネント
 │   │   ├── profile/        # プロフィール関連コンポーネント
 │   │   ├── ui/             # 共通UIコンポーネント
 │   │   └── Header.tsx      # ヘッダーコンポーネント
@@ -135,12 +139,14 @@ graph_e_rc2/
 │   ├── hooks/              # カスタムフック
 │   │   ├── useUserRole.ts  # ユーザーロール管理フック
 │   │   ├── useProfile.ts   # プロフィール管理フック
-│   │   └── useNotes.ts     # メモ管理フック
+│   │   ├── useNotes.ts     # メモ管理フック
+│   │   └── useTags.ts      # タグ管理フック
 │   ├── lib/                # ユーティリティ
 │   │   └── supabase.ts     # Supabase設定
 │   └── types/              # 型定義
 │       ├── profile.ts      # プロフィール関連の型定義
-│       └── note.ts         # メモ関連の型定義
+│       ├── note.ts         # メモ関連の型定義
+│       └── tag.ts          # タグ関連の型定義
 ├── public/                 # 静的ファイル
 │   └── avatars/            # アバター画像
 │       └── samples/        # サンプルアバター
@@ -165,6 +171,7 @@ graph_e_rc2/
 ✅ プロフィール画像機能（サンプルアバター選択、有料ユーザー向けカスタムアバター）  
 ✅ オンラインステータス管理（オンライン、オフライン、取り込み中）  
 ✅ メモ機能（作成、編集、削除、公開/非公開設定）  
+✅ タグ機能（タグの作成、編集、削除、メモへのタグ付け）  
 
 ### 進行中の機能
 🔄 リアルタイムチャット機能の実装  
@@ -185,6 +192,7 @@ graph_e_rc2/
 - 基本認証システム（完了）
 - ユーザープロフィール機能（完了）
 - メモ機能（完了）
+- タグ機能（完了）
 - リアルタイムチャット機能
 - 最初の「ぐらふい」ツール2つの移植（ハーモノグラフ、ライフゲーム）
 - 基本的なユーティリティツール
@@ -280,13 +288,15 @@ function NotesListComponent() {
 }
 ```
 
-#### メモの作成
+#### メモの作成（タグ付け機能付き）
 ```tsx
 import { useNotes } from '@/hooks/useNotes';
+import { useTags } from '@/hooks/useTags';
 import { NoteFormInput } from '@/types/note';
 
 function CreateNoteComponent() {
   const { createNote } = useNotes();
+  const { tags, createTag } = useTags();
   
   const handleSubmit = async (data: NoteFormInput) => {
     const { success, error } = await createNote(data);
@@ -299,12 +309,76 @@ function CreateNoteComponent() {
   
   return (
     <NoteForm 
-      initialData={{ title: '', content: '', is_public: false }}
+      initialData={{ title: '', content: '', is_public: false, tagIds: [] }}
       onSubmit={handleSubmit}
       loading={false}
       mode="create"
     />
   );
+}
+```
+
+### タグ機能の使用方法
+
+#### タグの取得と表示
+```tsx
+import { useTags } from '@/hooks/useTags';
+import TagBadge from '@/components/tags/TagBadge';
+
+function TagsListComponent() {
+  const { tags, loading, error } = useTags();
+  
+  if (loading) return <div>読み込み中...</div>;
+  if (error) return <div>エラー: {error}</div>;
+  
+  return (
+    <div>
+      <h1>タグ一覧</h1>
+      <div className="flex flex-wrap gap-2">
+        {tags.map(tag => (
+          <TagBadge key={tag.id} tag={tag} />
+        ))}
+      </div>
+    </div>
+  );
+}
+```
+
+#### タグセレクターの使用
+```tsx
+import { useTags } from '@/hooks/useTags';
+import TagSelector from '@/components/tags/TagSelector';
+import { useState } from 'react';
+
+function TagSelectorComponent() {
+  const { tags, createTag } = useTags();
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
+  
+  return (
+    <TagSelector
+      availableTags={tags}
+      selectedTagIds={selectedTagIds}
+      onChange={setSelectedTagIds}
+      onCreateTag={createTag}
+    />
+  );
+}
+```
+
+#### タグでメモをフィルタリング
+```tsx
+import { useNotes } from '@/hooks/useNotes';
+import { useRouter } from 'next/navigation';
+
+function FilterByTagComponent() {
+  const router = useRouter();
+  const { fetchNotesByTagId } = useNotes();
+  
+  const handleTagClick = (tagId: string) => {
+    router.push(`/notes/tags/${tagId}`);
+  };
+  
+  // ...
 }
 ```
 
@@ -416,7 +490,7 @@ This project is a real-time interactive platform built using Next.js, Supabase, 
 
 ### Newly Developed Features
 - **Real-time Chat**: Text communication between users
-- **Notes Feature**: Create and manage notes with public/private settings
+- **Notes Feature**: Create and manage notes with public/private settings and tagging
 - **Utility Tools**: JSON formatter, QR code generator, etc.
 - **Sharing & Collaboration**: Co-editing and real-time sharing of tools
 - **User Profiles**: Customizable profiles
@@ -478,6 +552,7 @@ For a detailed feature map, please refer to `docs/platform_mindmap.md`.
    - Open SQL Editor
    - Execute the contents of `/sql/scripts/user_profiles.sql`
    - If needed, execute `/sql/scripts/notes_table.sql`
+   - If you want to use tags, execute `/sql/scripts/tags/tags_tables.sql`
 
 5. Access the application
    ```
@@ -507,13 +582,16 @@ graph_e_rc2/
 │   │   ├── login/          # Login page
 │   │   ├── notes/          # Notes functionality
 │   │   │   ├── [id]/       # Note details and edit pages
-│   │   │   └── new/        # New note creation page
+│   │   │   ├── new/        # New note creation page
+│   │   │   └── tags/       # Notes by tag
+│   │   ├── tags/           # Tag management
 │   │   ├── settings/       # Settings pages
 │   │   │   └── profile/    # Profile settings
 │   │   └── signup/         # Signup page
 │   ├── components/         # Common components
 │   │   ├── auth/           # Authentication-related components
 │   │   ├── notes/          # Notes-related components
+│   │   ├── tags/           # Tags-related components
 │   │   ├── profile/        # Profile-related components
 │   │   ├── ui/             # Common UI components
 │   │   └── Header.tsx      # Header component
@@ -522,12 +600,14 @@ graph_e_rc2/
 │   ├── hooks/              # Custom hooks
 │   │   ├── useUserRole.ts  # User role management hook
 │   │   ├── useProfile.ts   # Profile management hook
-│   │   └── useNotes.ts     # Notes management hook
+│   │   ├── useNotes.ts     # Notes management hook
+│   │   └── useTags.ts      # Tags management hook
 │   ├── lib/                # Utilities
 │   │   └── supabase.ts     # Supabase configuration
 │   └── types/              # Type definitions
 │       ├── profile.ts      # Profile-related type definitions
-│       └── note.ts         # Notes-related type definitions
+│       ├── note.ts         # Notes-related type definitions
+│       └── tag.ts          # Tags-related type definitions
 ├── public/                 # Static files
 │   └── avatars/            # Avatar images
 │       └── samples/        # Sample avatars
@@ -552,6 +632,7 @@ graph_e_rc2/
 ✅ Profile image functionality (sample avatar selection, custom avatar for paid users)  
 ✅ Online status management (online, offline, busy)  
 ✅ Notes functionality (create, edit, delete, public/private settings)  
+✅ Tags functionality (create, edit, delete, tagging notes)  
 
 ### In Progress
 🔄 Real-time chat functionality implementation  
@@ -572,6 +653,7 @@ graph_e_rc2/
 - Basic authentication system (Completed)
 - User profile functionality (Completed)
 - Notes functionality (Completed)
+- Tags functionality (Completed)
 - Real-time chat functionality
 - First two "ぐらふい" tools migration (Harmonograph, Game of Life)
 - Basic utility tools
@@ -667,13 +749,15 @@ function NotesListComponent() {
 }
 ```
 
-#### Creating Notes
+#### Creating Notes (with tags)
 ```tsx
 import { useNotes } from '@/hooks/useNotes';
+import { useTags } from '@/hooks/useTags';
 import { NoteFormInput } from '@/types/note';
 
 function CreateNoteComponent() {
   const { createNote } = useNotes();
+  const { tags, createTag } = useTags();
   
   const handleSubmit = async (data: NoteFormInput) => {
     const { success, error } = await createNote(data);
@@ -686,12 +770,76 @@ function CreateNoteComponent() {
   
   return (
     <NoteForm 
-      initialData={{ title: '', content: '', is_public: false }}
+      initialData={{ title: '', content: '', is_public: false, tagIds: [] }}
       onSubmit={handleSubmit}
       loading={false}
       mode="create"
     />
   );
+}
+```
+
+### Using Tags Feature
+
+#### Fetching and Displaying Tags
+```tsx
+import { useTags } from '@/hooks/useTags';
+import TagBadge from '@/components/tags/TagBadge';
+
+function TagsListComponent() {
+  const { tags, loading, error } = useTags();
+  
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+  
+  return (
+    <div>
+      <h1>Tags List</h1>
+      <div className="flex flex-wrap gap-2">
+        {tags.map(tag => (
+          <TagBadge key={tag.id} tag={tag} />
+        ))}
+      </div>
+    </div>
+  );
+}
+```
+
+#### Using Tag Selector
+```tsx
+import { useTags } from '@/hooks/useTags';
+import TagSelector from '@/components/tags/TagSelector';
+import { useState } from 'react';
+
+function TagSelectorComponent() {
+  const { tags, createTag } = useTags();
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
+  
+  return (
+    <TagSelector
+      availableTags={tags}
+      selectedTagIds={selectedTagIds}
+      onChange={setSelectedTagIds}
+      onCreateTag={createTag}
+    />
+  );
+}
+```
+
+#### Filtering Notes by Tag
+```tsx
+import { useNotes } from '@/hooks/useNotes';
+import { useRouter } from 'next/navigation';
+
+function FilterByTagComponent() {
+  const router = useRouter();
+  const { fetchNotesByTagId } = useNotes();
+  
+  const handleTagClick = (tagId: string) => {
+    router.push(`/notes/tags/${tagId}`);
+  };
+  
+  // ...
 }
 ```
 

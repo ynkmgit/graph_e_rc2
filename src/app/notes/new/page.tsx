@@ -19,7 +19,8 @@ export default function NewNotePage() {
   const initialData = {
     title: '',
     content: '',
-    is_public: false
+    is_public: false,
+    tagIds: []
   };
 
   const handleSubmit = async (data: NoteFormInput) => {

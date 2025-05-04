@@ -1,31 +1,61 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/Button';
 import { NoteFormInput, isValidTitle, isValidContent } from '@/types/note';
+import { useTags } from '@/hooks/useTags';
+import TagSelector from '@/components/tags/TagSelector';
+import { Tag } from '@/types/tag';
 
 interface NoteFormProps {
   initialData: {
     title: string;
     content: string;
     is_public: boolean;
+    tagIds?: string[];
   };
   onSubmit: (data: NoteFormInput) => Promise<void>;
   loading: boolean;
   mode?: 'create' | 'edit';
+  noteId?: string;
 }
 
-export default function NoteForm({ initialData, onSubmit, loading, mode = 'create' }: NoteFormProps) {
+export default function NoteForm({ 
+  initialData, 
+  onSubmit, 
+  loading, 
+  mode = 'create',
+  noteId
+}: NoteFormProps) {
   const [formData, setFormData] = useState({
     title: initialData.title,
     content: initialData.content,
-    is_public: initialData.is_public
+    is_public: initialData.is_public,
+    tagIds: initialData.tagIds || []
   });
   
   const [errors, setErrors] = useState({
     title: '',
     content: ''
   });
+
+  // タグ関連のカスタムフック
+  const { 
+    tags, 
+    noteTags, 
+    loading: tagsLoading, 
+    createTag 
+  } = useTags(noteId);
+
+  // 編集モードで、noteIdが存在し、noteTagsが読み込まれたらtagIdsを更新
+  useEffect(() => {
+    if (mode === 'edit' && noteId && noteTags.length > 0) {
+      setFormData(prev => ({
+        ...prev,
+        tagIds: noteTags.map(tag => tag.id)
+      }));
+    }
+  }, [mode, noteId, noteTags]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -43,6 +73,11 @@ export default function NoteForm({ initialData, onSubmit, loading, mode = 'creat
     if (name === 'title' || name === 'content') {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
+  };
+
+  // タグ選択の変更を処理
+  const handleTagsChange = (tagIds: string[]) => {
+    setFormData(prev => ({ ...prev, tagIds }));
   };
 
   const validate = () => {
@@ -115,6 +150,22 @@ export default function NoteForm({ initialData, onSubmit, loading, mode = 'creat
         {errors.content && (
           <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.content}</p>
         )}
+      </div>
+      
+      {/* タグセレクター */}
+      <div>
+        <label
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+        >
+          タグ
+        </label>
+        <TagSelector
+          availableTags={tags}
+          selectedTagIds={formData.tagIds}
+          onChange={handleTagsChange}
+          onCreateTag={createTag}
+          className="mt-1"
+        />
       </div>
       
       <div className="flex items-center">

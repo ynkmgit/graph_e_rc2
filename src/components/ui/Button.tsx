@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'link';
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'link' | 'destructive';
   size?: 'sm' | 'md' | 'lg';
   fullWidth?: boolean;
   href?: string;
@@ -26,7 +26,8 @@ export const Button: React.FC<ButtonProps> = ({
     secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-100',
     outline: 'border border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800',
     ghost: 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800',
-    link: 'text-indigo-600 hover:underline dark:text-indigo-400 p-0'
+    link: 'text-indigo-600 hover:underline dark:text-indigo-400 p-0',
+    destructive: 'bg-red-600 text-white hover:bg-red-700 dark:bg-red-600 dark:text-white'
   };
 
   const sizes = {

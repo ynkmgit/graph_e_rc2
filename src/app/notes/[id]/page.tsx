@@ -7,6 +7,7 @@ import { Container } from '@/components/ui/Container';
 import { Button } from '@/components/ui/Button';
 import { useNotes } from '@/hooks/useNotes';
 import { useAuth } from '@/components/auth/AuthProvider';
+import TagBadge from '@/components/tags/TagBadge';
 
 export default function NotePage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -105,6 +106,15 @@ export default function NotePage({ params }: { params: { id: string } }) {
                   更新
                 </Button>
               </div>
+              
+              {/* タグの表示 */}
+              {note.tags && note.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {note.tags.map(tag => (
+                    <TagBadge key={tag.id} tag={tag} />
+                  ))}
+                </div>
+              )}
               
               <div className="prose prose-sm dark:prose-invert max-w-none pb-6 border-b dark:border-gray-700">
                 {note.content ? (
