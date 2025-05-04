@@ -60,19 +60,21 @@ export const useProfile = (): UseProfileResult => {
     // クリーンアップ: ページ離脱時にオフラインステータスに更新
     return () => {
       if (user) {
-        supabase
-          .from('user_profiles')
-          .update({ 
-            online_status: 'offline',
-            last_active_at: new Date().toISOString()
-          })
-          .eq('id', user.id)
-          .then(() => {
-            console.log('オフラインステータスに更新しました');
-          })
-          .catch((err) => {
-            console.error('ステータス更新エラー:', err);
-          });
+        try {
+          // Promiseを適切に扱うために修正
+          supabase
+            .from('user_profiles')
+            .update({ 
+              online_status: 'offline',
+              last_active_at: new Date().toISOString()
+            })
+            .eq('id', user.id)
+            .then(() => {
+              console.log('オフラインステータスに更新しました');
+            });
+        } catch (err) {
+          console.error('ステータス更新エラー:', err);
+        }
       }
     };
   }, [user]);
