@@ -4,8 +4,12 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/Button';
 import { NoteFormInput, isValidTitle, isValidContent } from '@/types/note';
 import { useTags } from '@/hooks/useTags';
+import { useNoteImages } from '@/hooks/useNoteImages';
 import TagSelector from '@/components/tags/TagSelector';
 import { Tag } from '@/types/tag';
+import { NoteImage, MarkdownImageData, getMarkdownImageString } from '@/types/noteImage';
+import ImageUploader from '@/components/images/ImageUploader';
+import ImageGallery from '@/components/images/ImageGallery';
 
 interface NoteFormProps {
   initialData: {
@@ -40,6 +44,7 @@ export default function NoteForm({
   });
   
   const [showMarkdownHelp, setShowMarkdownHelp] = useState(false);
+  const [showImageUploader, setShowImageUploader] = useState(false);
 
   // タグ関連のカスタムフック
   const { 
@@ -48,6 +53,15 @@ export default function NoteForm({
     loading: tagsLoading, 
     createTag 
   } = useTags(noteId);
+
+  // 画像関連のカスタムフック（編集モードでnoteIdがある場合のみ）
+  const {
+    images,
+    loading: imagesLoading,
+    uploading,
+    uploadMultipleImages,
+    deleteImage
+  } = useNoteImages(mode === 'edit' ? noteId : undefined);
 
   // 編集モードで、noteIdが存在し、noteTagsが読み込まれたらtagIdsを更新
   useEffect(() => {
@@ -108,6 +122,75 @@ export default function NoteForm({
     }
   };
 
+  // 画像アップロード処理
+  const handleImageUpload = async (files: File[]) => {
+    if (!noteId && mode === 'create') {
+      alert('メモを保存した後で画像をアップロードできます');
+      setShowImageUploader(false);
+      return;
+    }
+
+    try {
+      const results = await uploadMultipleImages(files);
+      
+      // アップロード成功したら、アップローダーを閉じる
+      if (results.every(result => result.success)) {
+        setShowImageUploader(false);
+      }
+    } catch (error) {
+      console.error('画像アップロードエラー:', error);
+    }
+  };
+
+  // 画像削除ハンドラー
+  const handleImageDelete = async (imageId: string) => {
+    await deleteImage(imageId);
+  };
+
+  // マークダウンエディタに画像を挿入
+  const handleInsertImage = (imageUrl: string, image: NoteImage) => {
+    // 画像のマークダウン挿入用データを作成
+    const markdownImageData: MarkdownImageData = {
+      id: image.id,
+      url: imageUrl,
+      file_name: image.file_name,
+      width: image.width,
+      height: image.height
+    };
+    
+    // マークダウン形式の画像文字列を生成
+    const imageMarkdown = getMarkdownImageString(markdownImageData);
+    
+    // 現在のカーソル位置（または末尾）に挿入
+    const textarea = document.getElementById('content') as HTMLTextAreaElement;
+    if (textarea) {
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const currentContent = formData.content;
+      
+      // カーソル位置に画像マークダウンを挿入
+      const newContent = currentContent.substring(0, start) + 
+        imageMarkdown + 
+        currentContent.substring(end);
+      
+      // フォームデータを更新
+      setFormData(prev => ({ ...prev, content: newContent }));
+      
+      // カーソル位置を挿入後の位置に設定
+      setTimeout(() => {
+        textarea.focus();
+        const newCursorPos = start + imageMarkdown.length;
+        textarea.setSelectionRange(newCursorPos, newCursorPos);
+      }, 0);
+    } else {
+      // テキストエリアが見つからない場合は末尾に追加
+      setFormData(prev => ({ 
+        ...prev, 
+        content: prev.content + '\n\n' + imageMarkdown 
+      }));
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
@@ -140,13 +223,24 @@ export default function NoteForm({
           >
             内容 <span className="text-xs text-blue-600 dark:text-blue-400">(マークダウン対応)</span>
           </label>
-          <button
-            type="button"
-            onClick={() => setShowMarkdownHelp(!showMarkdownHelp)}
-            className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
-          >
-            {showMarkdownHelp ? 'ヘルプを閉じる' : 'マークダウンのヘルプを表示'}
-          </button>
+          <div className="flex space-x-2">
+            <button
+              type="button"
+              onClick={() => setShowMarkdownHelp(!showMarkdownHelp)}
+              className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+            >
+              {showMarkdownHelp ? 'ヘルプを閉じる' : 'マークダウンのヘルプ'}
+            </button>
+            {mode === 'edit' && noteId && (
+              <button
+                type="button"
+                onClick={() => setShowImageUploader(!showImageUploader)}
+                className="text-xs text-green-600 dark:text-green-400 hover:underline"
+              >
+                {showImageUploader ? '画像アップローダーを閉じる' : '画像をアップロード'}
+              </button>
+            )}
+          </div>
         </div>
         
         {showMarkdownHelp && (
@@ -162,7 +256,35 @@ export default function NoteForm({
               <li><code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">1. 項目</code> - 番号付きリスト</li>
               <li><code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">```<br/>コードブロック<br/>```</code> - コードブロック</li>
               <li><code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">`インラインコード`</code> - インラインコード</li>
+              <li><code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">![代替テキスト](画像URL)</code> - 画像を挿入</li>
             </ul>
+          </div>
+        )}
+
+        {/* 画像アップローダー */}
+        {showImageUploader && mode === 'edit' && noteId && (
+          <div className="mb-3">
+            <ImageUploader
+              onUpload={handleImageUpload}
+              onCancel={() => setShowImageUploader(false)}
+              uploading={uploading}
+              currentImageCount={images.length}
+              className="mb-3"
+            />
+            
+            {/* 既存の画像ギャラリー */}
+            {!imagesLoading && images.length > 0 && (
+              <div className="mt-3">
+                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  アップロード済みの画像 ({images.length})
+                </h4>
+                <ImageGallery
+                  images={images}
+                  onDelete={handleImageDelete}
+                  onInsert={handleInsertImage}
+                />
+              </div>
+            )}
           </div>
         )}
         
@@ -225,6 +347,13 @@ export default function NoteForm({
           {loading ? '保存中...' : mode === 'create' ? '保存する' : '更新する'}
         </Button>
       </div>
+
+      {/* 注意書き：編集モードの場合 */}
+      {mode === 'create' && (
+        <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
+          メモを保存した後、画像をアップロードできます
+        </p>
+      )}
     </form>
   );
 }

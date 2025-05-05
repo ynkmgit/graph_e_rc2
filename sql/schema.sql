@@ -1,6 +1,6 @@
 /*
  * schema.sql
- * 最終更新日: 2025-05-04
+ * 最終更新日: 2025-05-05
  * 概要: 完全なデータベーススキーマ
  */
 
@@ -236,6 +236,81 @@ USING (
 -- 管理者はすべてのメモタグ関連にアクセス可能
 CREATE POLICY "管理者はすべてのメモタグ関連にアクセス可能" 
 ON public.note_tags FOR ALL 
+USING (
+  EXISTS (
+    SELECT 1 FROM public.user_profiles
+    WHERE id = auth.uid() AND role = 'admin'
+  )
+);
+
+-- メモ画像用のテーブル
+CREATE TABLE public.note_images (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  note_id UUID REFERENCES public.notes(id) NOT NULL,
+  user_id UUID REFERENCES auth.users(id) NOT NULL,
+  storage_path TEXT NOT NULL,
+  file_name TEXT NOT NULL,
+  file_size INTEGER NOT NULL,
+  mime_type TEXT NOT NULL,
+  width INTEGER,
+  height INTEGER,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL -- 論理削除用
+);
+
+-- インデックス
+CREATE INDEX idx_note_images_note_id ON public.note_images(note_id);
+CREATE INDEX idx_note_images_user_id ON public.note_images(user_id);
+CREATE INDEX idx_note_images_deleted_at ON public.note_images(deleted_at);
+
+-- Row Level Security ポリシー
+ALTER TABLE public.note_images ENABLE ROW LEVEL SECURITY;
+
+-- ユーザーは自分のメモの画像のみ参照可能
+CREATE POLICY "ユーザーは自分のメモの画像を参照可能" 
+ON public.note_images FOR SELECT 
+USING (
+  auth.uid() = user_id AND deleted_at IS NULL
+);
+
+-- 公開メモの画像は誰でも参照可能
+CREATE POLICY "公開メモの画像は誰でも参照可能" 
+ON public.note_images FOR SELECT 
+USING (
+  EXISTS (
+    SELECT 1 FROM public.notes
+    WHERE notes.id = note_id
+    AND notes.is_public = true
+    AND notes.deleted_at IS NULL
+  )
+);
+
+-- ユーザーは自分のメモの画像のみ作成可能
+CREATE POLICY "ユーザーは自分のメモの画像を作成可能" 
+ON public.note_images FOR INSERT 
+WITH CHECK (
+  auth.uid() = user_id AND
+  EXISTS (
+    SELECT 1 FROM public.notes
+    WHERE notes.id = note_id
+    AND notes.user_id = auth.uid()
+  )
+);
+
+-- ユーザーは自分のメモの画像のみ更新可能
+CREATE POLICY "ユーザーは自分のメモの画像を更新可能" 
+ON public.note_images FOR UPDATE 
+USING (auth.uid() = user_id);
+
+-- ユーザーは自分のメモの画像のみ削除可能
+CREATE POLICY "ユーザーは自分のメモの画像を削除可能" 
+ON public.note_images FOR DELETE 
+USING (auth.uid() = user_id);
+
+-- 管理者はすべてのメモの画像にアクセス可能
+CREATE POLICY "管理者はすべてのメモの画像にアクセス可能" 
+ON public.note_images FOR ALL 
 USING (
   EXISTS (
     SELECT 1 FROM public.user_profiles

@@ -32,6 +32,20 @@
   - `/sql/scripts/tags/tags_tables.sql` - タグ関連テーブル作成スクリプト
   - `/sql/scripts/tags/tags_tables_rollback.sql` - ロールバック用スクリプト
 
+## 2025-05-05 - メモ画像添付機能のためのテーブル追加
+- 変更内容：
+  - note_imagesテーブルを追加：メモに添付される画像のメタデータを管理
+  - 画像の基本情報（ファイル名、サイズ、MIME型など）と関連メモを紐付け
+  - 画像の解像度（幅・高さ）情報を保存
+  - 各メモ画像に対するRLSポリシーを設定：
+    - ユーザーは自分のメモの画像のみ作成・編集・削除可能
+    - 公開メモの画像は誰でも参照可能
+    - 管理者はすべてのメモ画像にアクセス可能
+  - Supabaseストレージバケット「note_images」を作成し、RLSポリシーを設定
+- 関連スクリプト：
+  - `/sql/scripts/storage/note_images_setup.sql` - メモ画像テーブル作成スクリプト
+  - `/sql/scripts/storage/note_images_rollback.sql` - ロールバック用スクリプト
+
 ## 今後の方針
 - データベース変更時には本ファイルに変更内容を記録する
 - schema.sqlファイルを常に最新の状態に保つ

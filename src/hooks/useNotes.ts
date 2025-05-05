@@ -359,6 +359,101 @@ export const useNotes = (noteId?: string) => {
     }
   };
 
+  // メモを検索する機能（タイトル、内容、タグで検索）
+  const searchNotes = async (query: string) => {
+    if (!user) {
+      return { notes: [], error: 'ログインしていません' };
+    }
+
+    try {
+      setLoading(true);
+      
+      // 検索文字列が空の場合は全件取得
+      if (!query.trim()) {
+        await fetchNotes();
+        return { notes, error: null };
+      }
+      
+      // タイトルか内容にキーワードが含まれるメモを検索
+      const { data: notesData, error: notesError } = await supabase
+        .from('notes')
+        .select('*')
+        .eq('user_id', user.id)
+        .is('deleted_at', null)
+        .or(`title.ilike.%${query}%,content.ilike.%${query}%`)
+        .order('updated_at', { ascending: false });
+
+      if (notesError) throw notesError;
+      
+      // タグ名に基づくメモIDの検索
+      const { data: tagNotesData, error: tagNotesError } = await supabase
+        .from('tags')
+        .select('note_tags!inner(note_id)')
+        .eq('user_id', user.id)
+        .is('deleted_at', null)
+        .ilike('name', `%${query}%`);
+
+      if (tagNotesError) throw tagNotesError;
+      
+      // タグ検索でヒットしたメモIDの配列を作成
+      const tagNoteIds = tagNotesData
+        .flatMap(tag => tag.note_tags)
+        .map(noteTag => noteTag.note_id);
+      
+      // タグ検索でヒットしたメモを取得（内容検索と重複しないよう注意）
+      let additionalNotes: any[] = [];
+      if (tagNoteIds.length > 0) {
+        const existingIds = notesData.map(note => note.id);
+        const uniqueTagNoteIds = tagNoteIds.filter(id => !existingIds.includes(id));
+        
+        if (uniqueTagNoteIds.length > 0) {
+          const { data: additionalNotesData, error: additionalNotesError } = await supabase
+            .from('notes')
+            .select('*')
+            .in('id', uniqueTagNoteIds)
+            .eq('user_id', user.id)
+            .is('deleted_at', null);
+          
+          if (additionalNotesError) throw additionalNotesError;
+          additionalNotes = additionalNotesData;
+        }
+      }
+      
+      // 全ての検索結果を結合
+      const combinedNotesData = [...notesData, ...additionalNotes];
+      
+      // 各メモのタグ情報を取得
+      const notesWithTags = await Promise.all(
+        combinedNotesData.map(async (noteItem) => {
+          const { data: tagData, error: tagError } = await supabase
+            .from('note_tags')
+            .select('tags:tag_id(*)')
+            .eq('note_id', noteItem.id);
+          
+          if (tagError) {
+            console.error('タグ取得エラー:', tagError);
+            return { ...noteItem, tags: [] };
+          }
+          
+          return {
+            ...noteItem,
+            tags: tagData.map(item => item.tags as unknown as Tag)
+          };
+        })
+      );
+      
+      // 検索結果をstateに保存
+      setNotes(notesWithTags as Note[]);
+      return { notes: notesWithTags as Note[], error: null };
+    } catch (err: any) {
+      console.error('メモ検索エラー:', err);
+      setError(err.message || 'メモの検索に失敗しました');
+      return { notes: [], error: err.message || 'メモの検索に失敗しました' };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // 特定のIDが指定されている場合は、そのメモを取得
   useEffect(() => {
     if (noteId) {
@@ -379,6 +474,7 @@ export const useNotes = (noteId?: string) => {
     fetchNotesByTagId,
     createNote,
     updateNote,
-    deleteNote
+    deleteNote,
+    searchNotes // 追加: 検索機能
   };
 };

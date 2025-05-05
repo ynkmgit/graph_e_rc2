@@ -18,12 +18,33 @@ interface CodeProps {
   children?: React.ReactNode;
 }
 
+// 画像プロパティの拡張インターフェース
+interface ImgProps {
+  node?: any;
+  src?: string;
+  alt?: string;
+  title?: string;
+  width?: string;
+  height?: string;
+}
+
 const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, className = '' }) => {
   if (!content) {
     return (
       <p className="text-gray-400 dark:text-gray-500 italic">内容なし</p>
     );
   }
+  
+  // 画像サイズの属性を解析するためのカスタムマークダウン変換
+  const customMarkdown = content.replace(
+    /!\[(.*?)\]\((.*?)(?:\s+width="(\d+)"\s+height="(\d+)")?\)/g,
+    (match, alt, src, width, height) => {
+      if (width && height) {
+        return `![${alt}](${src}?width=${width}&height=${height})`;
+      }
+      return match;
+    }
+  );
   
   // 型アサーションを使用してコンポーネントを定義
   const components: Components = {
@@ -76,14 +97,36 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, className 
     th: ({ node, ...props }) => <th className="px-4 py-2 text-left font-medium" {...props} />,
     td: ({ node, ...props }) => <td className="px-4 py-2" {...props} />,
     hr: ({ node, ...props }) => <hr className="my-6 border-gray-300 dark:border-gray-700" {...props} />,
-    img: ({ node, ...props }) => (
-      <img
-        {...props}
-        className="max-w-full h-auto rounded-md my-4"
-        alt={props.alt || 'Image'}
-        loading="lazy"
-      />
-    ),
+    // 画像コンポーネントをカスタマイズして幅と高さのサポートを追加
+    img: ({ node, src = '', alt = '', ...props }: ImgProps) => {
+      // URLから幅と高さのパラメータを抽出
+      const url = new URL(src, window.location.origin);
+      const width = url.searchParams.get('width');
+      const height = url.searchParams.get('height');
+      
+      // 幅と高さのスタイルを設定
+      const style: React.CSSProperties = {};
+      if (width) {
+        style.width = `${width}px`;
+      }
+      if (height) {
+        style.height = `${height}px`;
+      }
+      
+      // クエリパラメータのない元のURLを取得
+      const baseUrl = src.split('?')[0];
+      
+      return (
+        <img
+          src={baseUrl}
+          alt={alt || 'Image'}
+          style={style}
+          className="max-w-full h-auto rounded-md my-4"
+          loading="lazy"
+          {...props}
+        />
+      );
+    },
   };
 
   return (
@@ -92,7 +135,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, className 
         remarkPlugins={[remarkGfm]}
         components={components}
       >
-        {content}
+        {customMarkdown}
       </ReactMarkdown>
     </div>
   );
