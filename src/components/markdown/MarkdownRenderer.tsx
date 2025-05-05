@@ -18,14 +18,14 @@ interface CodeProps {
   children?: React.ReactNode;
 }
 
-// 画像プロパティの拡張インターフェース
+// 画像プロパティの拡張インターフェース - widthとheightの型を修正
 interface ImgProps {
   node?: any;
   src?: string;
   alt?: string;
   title?: string;
-  width?: string;
-  height?: string;
+  width?: string | number;
+  height?: string | number;
 }
 
 const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, className = '' }) => {
@@ -99,33 +99,46 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, className 
     hr: ({ node, ...props }) => <hr className="my-6 border-gray-300 dark:border-gray-700" {...props} />,
     // 画像コンポーネントをカスタマイズして幅と高さのサポートを追加
     img: ({ node, src = '', alt = '', ...props }: ImgProps) => {
-      // URLから幅と高さのパラメータを抽出
-      const url = new URL(src, window.location.origin);
-      const width = url.searchParams.get('width');
-      const height = url.searchParams.get('height');
-      
-      // 幅と高さのスタイルを設定
-      const style: React.CSSProperties = {};
-      if (width) {
-        style.width = `${width}px`;
+      try {
+        // URLから幅と高さのパラメータを抽出
+        const url = new URL(src, window.location.origin);
+        const width = url.searchParams.get('width');
+        const height = url.searchParams.get('height');
+        
+        // 幅と高さのスタイルを設定
+        const style: React.CSSProperties = {};
+        if (width) {
+          style.width = `${width}px`;
+        }
+        if (height) {
+          style.height = `${height}px`;
+        }
+        
+        // クエリパラメータのない元のURLを取得
+        const baseUrl = src.split('?')[0];
+        
+        return (
+          <img
+            src={baseUrl}
+            alt={alt || 'Image'}
+            style={style}
+            className="max-w-full h-auto rounded-md my-4"
+            loading="lazy"
+            {...props}
+          />
+        );
+      } catch (error) {
+        // URLの解析に失敗した場合、元のソースをそのまま使用
+        return (
+          <img
+            src={src}
+            alt={alt || 'Image'}
+            className="max-w-full h-auto rounded-md my-4"
+            loading="lazy"
+            {...props}
+          />
+        );
       }
-      if (height) {
-        style.height = `${height}px`;
-      }
-      
-      // クエリパラメータのない元のURLを取得
-      const baseUrl = src.split('?')[0];
-      
-      return (
-        <img
-          src={baseUrl}
-          alt={alt || 'Image'}
-          style={style}
-          className="max-w-full h-auto rounded-md my-4"
-          loading="lazy"
-          {...props}
-        />
-      );
     },
   };
 
